@@ -12,7 +12,7 @@ import {
   View
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { auth, db } from "../../Firebase/config"; // ✅ adjust path
+import { auth, db } from "../../Firebase/config"; 
 
 export default function Signup() {
   const [role, setRole] = useState("donor");

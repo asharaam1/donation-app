@@ -1,5 +1,23 @@
-import { Stack } from 'expo-router';
+import { Tabs } from 'expo-router';
 
 export default function DonorLayout() {
-  return <Stack />;
+  return (
+    <Tabs screenOptions={{ headerShown: false }}>
+      <Tabs.Screen
+        name="index"
+        options={{
+          title: 'index',
+          tabBarLabel: 'index'
+        }}
+      />
+      <Tabs.Screen
+        name="give"
+        options={{
+          title: 'Give',
+          tabBarLabel: 'Give'
+        }}
+      />
+    </Tabs>
+
+  )
 }

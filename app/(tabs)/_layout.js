@@ -1,5 +1,5 @@
 // app/(tabs)/_layout.js
-import { Tabs } from 'expo-router';
+import { Stack } from 'expo-router';
 import { doc, getDoc } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
@@ -33,42 +33,22 @@ export default function TabsLayout() {
   }
 
   return (
-    <Tabs screenOptions={{ headerShown: false }}>
+    <Stack screenOptions={{ headerShown: false }}>
       {userRole === 'donor' ? (
-        <>
-          <Tabs.Screen 
-            name="donor/index" 
-            options={{ 
-              title: 'Donor',
-              tabBarLabel: 'Donor Dashboard'
-            }} 
-          />
-          <Tabs.Screen 
-            name="donor/donations" 
-            options={{ 
-              title: 'My Donations',
-              tabBarLabel: 'My Donations'
-            }} 
-          />
-        </>
-      ) : (
-        <>
-          <Tabs.Screen 
-            name="needy/index" 
-            options={{ 
-              title: 'Needy',
-              tabBarLabel: 'Needy Dashboard'
-            }} 
-          />
-          <Tabs.Screen 
-            name="needy/requests" 
-            options={{ 
-              title: 'My Requests',
-              tabBarLabel: 'My Requests'
-            }} 
-          />
-        </>
-      )}
-    </Tabs>
+        <Stack.Screen 
+          name="donor" 
+          options={{ 
+            title: 'Donor'
+          }} 
+        />
+      ) : userRole === 'needy' ? (
+        <Stack.Screen 
+          name="needy" 
+          options={{ 
+            title: 'Needy'
+          }} 
+        />
+      ) : null}
+    </Stack>
   );
 }
