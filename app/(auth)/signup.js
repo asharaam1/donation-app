@@ -1,3 +1,4 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
 import { createUserWithEmailAndPassword } from "firebase/auth";
@@ -17,13 +18,13 @@ import { auth, db } from "../../Firebase/config";
 import logo from "../../assets/images/logo.png";
 
 export default function Signup() {
-  const [role, setRole] = useState("");
+  const [role, setRole] = useState("donor");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [contact, setContact] = useState("");
-  const [country, setCountry] = useState("");
+  const [city, setCity] = useState("");
   const [image, setImage] = useState(null);
   const [uploading, setUploading] = useState(false);
 
@@ -99,20 +100,30 @@ export default function Signup() {
         password
       );
       const user = userCredential.user;
-
-      await setDoc(doc(db, "users", user.uid), {
+      const obj = {
         uid: user.uid,
         fullName,
         email,
-        contact,
-        country,
         role,
         profileImageUrl: imageUrl,
-        createdAt: new Date(),
-      });
+        createdAt: Date.now(),
+      };
+      if (role === "needy") {
+        obj.contact = contact;
+        obj.city = city;
+      }
+      await setDoc(doc(db, "users", user.uid), obj );
+      AsyncStorage.setItem('uid', user.id);
+      AsyncStorage.setItem('user', JSON.stringify(obj))
 
       console.log("User registered and data saved.");
-      router.push("/");
+      if (role === "donor") {
+        router.push("/donor");
+      } else if (role === "needy") {
+        router.push("/needy");
+      } else {
+        router.push("/"); // fallback
+      }
     } catch (error) {
       console.error("Signup error:", error.message);
     }
@@ -131,21 +142,27 @@ export default function Signup() {
               <TouchableOpacity
                 style={[
                   styles.roleButton,
-                  role === "donor" && styles.activeRole,
+                  role !== "donor" ? styles.inactiveRole : null,
                 ]}
                 onPress={() => setRole("donor")}
               >
-                <Text style={styles.roleButtonText}>Donor</Text>
+                <Text style={[
+                  styles.roleButtonText,
+                  role !== "donor" ? styles.inactiveRoleText : null,
+                ]}>Donor</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
                 style={[
                   styles.roleButton,
-                  role === "needy" && styles.activeRole,
+                  role !== "needy" ? styles.inactiveRole : null,
                 ]}
                 onPress={() => setRole("needy")}
               >
-                <Text style={styles.roleButtonText}>Needy</Text>
+                <Text style={[
+                  styles.roleButtonText,
+                  role !== "needy" ? styles.inactiveRoleText : null,
+                ]}>Needy</Text>
               </TouchableOpacity>
             </View>
 
@@ -172,19 +189,23 @@ export default function Signup() {
               onChangeText={setEmail}
               keyboardType="email-address"
             />
-            <TextInput
-              style={styles.input}
-              placeholder="Phone Number"
-              value={contact}
-              onChangeText={setContact}
-              keyboardType="phone-pad"
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Country"
-              value={country}
-              onChangeText={setCountry}
-            />
+            {role === "needy" && (
+              <>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Phone Number"
+                  value={contact}
+                  onChangeText={setContact}
+                  keyboardType="phone-pad"
+                />
+                <TextInput
+                  style={styles.input}
+                  placeholder="City"
+                  value={city}
+                  onChangeText={setCity}
+                />
+              </>
+            )}
             <TextInput
               style={styles.input}
               placeholder="Password"
@@ -293,13 +314,16 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 3,
   },
-  activeRole: {
-    backgroundColor: "#e85c20",
+  inactiveRole: {
+    backgroundColor: "#d1d5dc",
   },
   roleButtonText: {
     color: "#FFFFFF",
     fontSize: 16,
     fontWeight: "600",
+  },
+  inactiveRoleText: {
+    color: "#000",
   },
   loginLink: {
     color: "#FF5F15",

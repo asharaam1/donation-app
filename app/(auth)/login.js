@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import logo from "../../assets/images/logo.png"; // updated relative path
 import { auth, db } from "../../Firebase/config"; // also update path if needed
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -26,6 +27,7 @@ export default function Login() {
       
       // Get user data from Firestore
       const userRef = doc(db, "users", user.uid);
+      AsyncStorage.setItem('uid', user.uid)
       const userSnap = await getDoc(userRef);
 
       if (userSnap.exists()) {
