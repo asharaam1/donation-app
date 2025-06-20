@@ -8,6 +8,7 @@
     "scheme": "donationapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "permissions": ["CAMERA"],
     "ios": {
       "supportsTablet": true
     },

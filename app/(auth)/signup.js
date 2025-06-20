@@ -1,21 +1,23 @@
-// app/auth/signup.js
 import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import { useState } from "react";
 import {
+  Image,
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
-  View
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { auth, db } from "../../Firebase/config"; 
+import { auth, db } from "../../Firebase/config";
+import logo from "../../assets/images/logo.png";
 
 export default function Signup() {
-  const [role, setRole] = useState("donor");
+  const [role, setRole] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -24,7 +26,6 @@ export default function Signup() {
   const [country, setCountry] = useState("");
   const [image, setImage] = useState(null);
   const [uploading, setUploading] = useState(false);
-  const [error, setError] = useState("");
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -36,6 +37,7 @@ export default function Signup() {
 
     if (!result.canceled) {
       setImage(result.assets[0].uri);
+      console.log("Image URI:", result.assets[0].uri);
     }
   };
 
@@ -43,6 +45,7 @@ export default function Signup() {
     try {
       const response = await fetch(imageUri);
       const blob = await response.blob();
+
       const data = new FormData();
       data.append("file", blob, "profile-image.jpg");
       data.append("upload_preset", "react-native");
@@ -57,7 +60,14 @@ export default function Signup() {
       );
 
       const result = await res.json();
-      return result.secure_url || null;
+
+      if (result.secure_url) {
+        console.log("Uploaded Image URL:", result.secure_url);
+        return result.secure_url;
+      } else {
+        console.error("Cloudinary Upload Error:", result);
+        return null;
+      }
     } catch (err) {
       console.error("Upload failed:", err);
       return null;
@@ -65,8 +75,15 @@ export default function Signup() {
   };
 
   const signup = async () => {
-    if (!role || !fullName || !email || !password || !confirmPassword) return;
-    if (password !== confirmPassword) return;
+    if (!role || !fullName || !email || !password || !confirmPassword) {
+      console.log("Please fill in all required fields.");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      console.log("Passwords do not match.");
+      return;
+    }
 
     setUploading(true);
     let imageUrl = null;
@@ -94,7 +111,8 @@ export default function Signup() {
         createdAt: new Date(),
       });
 
-      router.push("/auth/login"); // ✅ go to login page
+      console.log("User registered and data saved.");
+      router.push("/");
     } catch (error) {
       console.error("Signup error:", error.message);
     }
@@ -104,12 +122,103 @@ export default function Signup() {
     <ScrollView>
       <SafeAreaView>
         <View style={styles.container}>
-          {/* ... same UI as before ... */}
-          <TouchableOpacity onPress={() => router.push("/auth/login")}>
-            <Text style={styles.loginLink}>
-              Already have an account? Login
-            </Text>
-          </TouchableOpacity>
+          <View style={styles.signupContainer}>
+            <Image source={logo} style={styles.logo} resizeMode="contain" />
+            <Text style={styles.title}>Sign Up</Text>
+
+            {/* Role Buttons */}
+            <View style={styles.roleButtonsRow}>
+              <TouchableOpacity
+                style={[
+                  styles.roleButton,
+                  role === "donor" && styles.activeRole,
+                ]}
+                onPress={() => setRole("donor")}
+              >
+                <Text style={styles.roleButtonText}>Donor</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[
+                  styles.roleButton,
+                  role === "needy" && styles.activeRole,
+                ]}
+                onPress={() => setRole("needy")}
+              >
+                <Text style={styles.roleButtonText}>Needy</Text>
+              </TouchableOpacity>
+            </View>
+
+            <TouchableOpacity onPress={pickImage}>
+              <View style={styles.imagePicker}>
+                {image ? (
+                  <Image source={{ uri: image }} style={styles.previewImage} />
+                ) : (
+                  <Text style={{ color: "#666" }}>Pick Profile Image</Text>
+                )}
+              </View>
+            </TouchableOpacity>
+
+            <TextInput
+              style={styles.input}
+              placeholder="Full Name"
+              value={fullName}
+              onChangeText={setFullName}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Email"
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Phone Number"
+              value={contact}
+              onChangeText={setContact}
+              keyboardType="phone-pad"
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Country"
+              value={country}
+              onChangeText={setCountry}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Password"
+              secureTextEntry
+              value={password}
+              onChangeText={setPassword}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Confirm Password"
+              secureTextEntry
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
+            />
+
+            <TouchableOpacity
+              style={[
+                styles.signupButton,
+                uploading && { backgroundColor: "#ccc" },
+              ]}
+              onPress={signup}
+              disabled={uploading}
+            >
+              <Text style={styles.signupButtonText}>
+                {uploading ? "Creating Account..." : "Create Account"}
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={() => router.push("/")}>
+              <Text style={styles.loginLink}>
+                Already have an account? Login
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </SafeAreaView>
     </ScrollView>
@@ -117,5 +226,100 @@ export default function Signup() {
 }
 
 const styles = StyleSheet.create({
-  // same as before
+  container: {
+    flex: 1,
+    backgroundColor: "#FFFFFF",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  signupContainer: {
+    width: "85%",
+    padding: 20,
+    alignItems: "center",
+  },
+  logo: {
+    width: 140,
+    height: 140,
+    marginBottom: 25,
+  },
+  title: {
+    fontSize: 32,
+    fontWeight: "bold",
+    color: "#FF5F15",
+    marginBottom: 30,
+    textAlign: "center",
+  },
+  input: {
+    backgroundColor: "#F5F5F5",
+    padding: 13,
+    borderRadius: 10,
+    marginBottom: 12,
+    fontSize: 16,
+    width: "100%",
+  },
+  signupButton: {
+    backgroundColor: "#FF5F15",
+    paddingVertical: 13,
+    borderRadius: 10,
+    alignItems: "center",
+    marginTop: 10,
+    width: "100%",
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+  },
+  signupButtonText: {
+    color: "#FFFFFF",
+    fontSize: 17,
+    fontWeight: "bold",
+  },
+  roleButtonsRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 15,
+    width: "100%",
+  },
+  roleButton: {
+    backgroundColor: "#FF5F15",
+    flex: 0.48,
+    paddingVertical: 12,
+    borderRadius: 10,
+    alignItems: "center",
+    elevation: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+  },
+  activeRole: {
+    backgroundColor: "#e85c20",
+  },
+  roleButtonText: {
+    color: "#FFFFFF",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  loginLink: {
+    color: "#FF5F15",
+    textAlign: "center",
+    marginTop: 20,
+    fontSize: 16,
+  },
+  imagePicker: {
+    width: 100,
+    height: 100,
+    backgroundColor: "#f2f2f2",
+    borderRadius: 50,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 15,
+    overflow: "hidden",
+  },
+  previewImage: {
+    width: "100%",
+    height: "100%",
+    borderRadius: 50,
+  },
 });
