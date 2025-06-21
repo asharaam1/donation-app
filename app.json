@@ -8,7 +8,9 @@
     "scheme": "donationapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
-    "permissions": ["CAMERA"],
+    "permissions": [
+      "CAMERA"
+    ],
     "ios": {
       "supportsTablet": true
     },
@@ -34,7 +36,8 @@
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
-      ]
+      ],
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true
