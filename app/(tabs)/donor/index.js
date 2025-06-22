@@ -13,18 +13,18 @@ import {
 } from "react-native";
 import Swiper from "react-native-swiper";
 import carouselImage1 from "../../../assets/images/carosuel-1.jpg";
+import cardimg from "../../../assets/images/Donationcard1.jpg";
+import cardimg2 from "../../../assets/images/Donationcard2.jpg";
+import cardimg3 from "../../../assets/images/Donationcard3.jpg";
+import cardimg4 from "../../../assets/images/Donationcard4.webp";
 import {
   default as carouselImage2,
   default as carouselImage4,
 } from "../../../assets/images/donationpagebanner-copy.jpg";
 import carouselImage3 from "../../../assets/images/poverty_2226036b.webp";
+import { DonationCard } from "../../../components/DonationCard.js";
 import Testimonial from "../../../components/Testimonials.js";
 import { auth } from "../../../Firebase/config.js";
-import { DonationCard } from "../../../components/DonationCard.js";
-import cardimg from "../../../assets/images/Donationcard1.jpg";
-import cardimg2 from "../../../assets/images/Donationcard2.jpg";
-import cardimg3 from "../../../assets/images/Donationcard3.jpg";
-import cardimg4 from "../../../assets/images/Donationcard4.webp";
 
 // DonationCard Component
 
@@ -483,10 +483,10 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 15,
     borderTopRightRadius: 15,
   },
-  cardContent: {
+  donationCardContent: {
     padding: 15,
   },
-  cardTitle: {
+  donationCardTitle: {
     fontSize: 18,
     fontWeight: "bold",
     color: "#2d3748",

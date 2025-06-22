@@ -33,18 +33,22 @@ const _layout = () => {
       <Tabs.Screen
         name="index"
         options={{
-          tabBarItem: { showIcon: false, showLabel: false },
-          headerShown: false,
+          headerShown: true,
+          header: () => <DonorHeader />,
+          tabBarIcon: ({ size }) => (
+            <Ionicons name="home-outline" size={size} color="#FF5F15" />
+          ),
+          tabBarLabel: "Home",
         }}
       />
-      <Tabs.Screen
+      {/* <Tabs.Screen
         name="signup"
         options={{
           tabBarItem: { showIcon: false, showLabel: false },
           headerShown: false,
         }}
-      />
-      <Tabs.Screen
+      /> */}
+      {/* <Tabs.Screen
         name="donor"
         options={{
           headerShown: true,
@@ -54,9 +58,9 @@ const _layout = () => {
           ),
           tabBarLabel: "Home",
         }}
-      />
+      /> */}
       <Tabs.Screen
-        name="Give"
+        name="give"
         options={{
           headerShown: false,
           tabBarIcon: ({ size }) => (
@@ -68,7 +72,7 @@ const _layout = () => {
         }}
       />
       <Tabs.Screen
-        name="profile"
+        name="Profile"
         options={{
           headerShown: true,
           title: "Profile",
@@ -85,20 +89,6 @@ const _layout = () => {
               onPress={handleLogout}
             />
           ),
-        }}
-      />
-      <Tabs.Screen
-        name="personalinfo"
-        options={{
-          tabBarItem: { showIcon: false, showLabel: false },
-          headerShown: false,
-        }}
-      />
-      <Tabs.Screen
-        name="address"
-        options={{
-          tabBarItem: { showIcon: false, showLabel: false },
-          headerShown: false,
         }}
       />
     </Tabs>

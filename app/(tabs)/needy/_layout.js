@@ -22,6 +22,20 @@ export default function DonorLayout() {
           tabBarLabel: 'fundraise'
         }}
       />
+      <Tabs.Screen
+        name="kycVerify"
+        options={{
+          title: 'kycVerify',
+          tabBarLabel: 'kycVerify'
+        }}
+      />
+      <Tabs.Screen
+        name="profile"
+        options={{
+          title: 'profile',
+          tabBarLabel: 'profile'
+        }}
+      />
     </Tabs>
 
   )
