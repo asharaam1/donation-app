@@ -1,10 +1,14 @@
 // app/_layout.js
-import { Redirect, Stack } from 'expo-router';
-import { doc, getDoc } from 'firebase/firestore';
-import { useEffect, useState } from 'react';
-import { ActivityIndicator, View } from 'react-native';
-import { AuthProvider, useAuth } from '../context/AuthContext';
-import { db } from '../Firebase/config';
+import { Redirect, Stack } from "expo-router";
+import { doc, getDoc } from "firebase/firestore";
+import { useEffect, useState } from "react";
+import { ActivityIndicator, View } from "react-native";
+import { AuthProvider, useAuth } from "../context/AuthContext";
+import { db } from "../Firebase/config";
+
+if (typeof setImmediate === "undefined") {
+  global.setImmediate = setTimeout;
+}
 
 function RootLayoutContent() {
   const { user, loading } = useAuth();
@@ -41,7 +45,14 @@ function RootLayoutContent() {
 
   if (loading || roleLoading) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#FFFFFF' }}>
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: "#FFFFFF",
+        }}
+      >
         <ActivityIndicator size="large" color="#FF5F15" />
       </View>
     );
@@ -51,13 +62,27 @@ function RootLayoutContent() {
     <Stack screenOptions={{ headerShown: false }}>
       {!user ? (
         <Stack.Screen name="(auth)" />
-      ) : userRole === 'donor' ? (
+      ) : userRole === "donor" ? (
         <Redirect href="/(tabs)/donor" />
-      ) : userRole === 'needy' ? (
+      ) : userRole === "needy" ? (
         <Redirect href="/(tabs)/needy" />
       ) : (
         <Redirect href="/(auth)/login" /> // Fallback if role is not set or invalid
       )}
+
+      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      <Stack.Screen name="index" options={{ headerShown: false }} />
+      <Stack.Screen name="signup" options={{ headerShown: false }} />
+      <Stack.Screen name="donor" options={{ headerShown: false }} />
+      <Stack.Screen name="profile" options={{ headerShown: false }} />
+      <Stack.Screen
+        name="personalinfo"
+        options={{ headerShown: true, title: "Personal Info" }}
+      />
+      <Stack.Screen
+        name="address"
+        options={{ headerShown: true, title: "Address" }}
+      />
     </Stack>
   );
 }
