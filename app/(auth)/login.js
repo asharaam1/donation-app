@@ -2,7 +2,7 @@ import { router } from "expo-router";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
-import { useState , useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   Image,
   StyleSheet,
@@ -23,24 +23,24 @@ export default function Login() {
   // const [Timeout, setTimeout] = useState(null);
 
 
-  useEffect(() => {
-    // Check if user is already logged in 
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        router.push("/(tabs)/donor");
-      }
-    });
-    })
+  // useEffect(() => {
+  //   // Check if user is already logged in 
+  //   onAuthStateChanged(auth, (user) => {
+  //     if (user) {
+  //       router.push("/(tabs)/donor");
+  //     }
+  //   });
+  // })
 
-   
- 
+
+
 
   // This is a no-op edit to force re-evaluation
   const login = async () => {
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
-      
+
       // Get user data from Firestore
       const userRef = doc(db, "users", user.uid);
       AsyncStorage.setItem('uid', user.uid)
