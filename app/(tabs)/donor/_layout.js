@@ -12,7 +12,7 @@ const handleLogout = () => {
       router.push("/");
     })
     .catch((error) => {
-      // An error happened.
+      // Handle error if needed
     });
 };
 
@@ -33,15 +33,21 @@ const _layout = () => {
       <Tabs.Screen
         name="index"
         options={{
-          tabBarItem: { showIcon: false, showLabel: false },
           headerShown: false,
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="home" size={size} color={color} />
+          ),
+          tabBarLabel: "Dashboard",
         }}
       />
       <Tabs.Screen
         name="signup"
         options={{
-          tabBarItem: { showIcon: false, showLabel: false },
           headerShown: false,
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="person-add-outline" size={size} color={color} />
+          ),
+          tabBarLabel: "Sign Up",
         }}
       />
       <Tabs.Screen
@@ -49,19 +55,19 @@ const _layout = () => {
         options={{
           headerShown: true,
           header: () => <DonorHeader />,
-          tabBarIcon: ({ size }) => (
-            <Ionicons name="home-outline" size={size} color="#FF5F15" />
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="heart-outline" size={size} color={color} />
           ),
-          tabBarLabel: "Home",
+          tabBarLabel: "Donor",
         }}
       />
       <Tabs.Screen
         name="Give"
         options={{
           headerShown: false,
-          tabBarIcon: ({ size }) => (
+          tabBarIcon: ({ color }) => (
             <View style={{ marginBottom: 10 }}>
-              <Ionicons name="add-circle-outline" size={40} color="#FF5F15" />
+              <Ionicons name="add-circle-outline" size={40} color={color} />
             </View>
           ),
           tabBarLabel: "Give",
@@ -72,8 +78,8 @@ const _layout = () => {
         options={{
           headerShown: true,
           title: "Profile",
-          tabBarIcon: ({ size }) => (
-            <Ionicons name="person-outline" size={size} color="#FF5F15" />
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="person-outline" size={size} color={color} />
           ),
           tabBarLabel: "Profile",
           headerRight: () => (
@@ -90,15 +96,21 @@ const _layout = () => {
       <Tabs.Screen
         name="personalinfo"
         options={{
-          tabBarItem: { showIcon: false, showLabel: false },
           headerShown: false,
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="information-circle-outline" size={size} color={color} />
+          ),
+          tabBarLabel: "Info",
         }}
       />
       <Tabs.Screen
         name="address"
         options={{
-          tabBarItem: { showIcon: false, showLabel: false },
           headerShown: false,
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="location-outline" size={size} color={color} />
+          ),
+          tabBarLabel: "Address",
         }}
       />
     </Tabs>

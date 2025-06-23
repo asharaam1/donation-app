@@ -23,14 +23,14 @@ export default function Login() {
   // const [Timeout, setTimeout] = useState(null);
 
 
-  useEffect(() => {
-    // Check if user is already logged in 
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        router.push("/(tabs)/donor");
-      }
-    });
-    })
+  // useEffect(() => {
+  //   // Check if user is already logged in 
+  //   onAuthStateChanged(auth, (user) => {
+  //     if (user) {
+  //       router.push("/(tabs)/donor");
+  //     }
+  //   });
+  //   })
 
    
  

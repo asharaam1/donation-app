@@ -20,7 +20,7 @@ import {
 import carouselImage3 from "../../../assets/images/poverty_2226036b.webp";
 import Testimonial from "../../../components/Testimonials.js";
 import { auth } from "../../../Firebase/config.js";
-import { DonationCard } from "../../../components/DonationCard.js";
+import { Card } from "../../../components/Card.js";
 import cardimg from "../../../assets/images/Donationcard1.jpg";
 import cardimg2 from "../../../assets/images/Donationcard2.jpg";
 import cardimg3 from "../../../assets/images/Donationcard3.jpg";
@@ -197,28 +197,28 @@ const DonorScreen = () => {
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Together We Can Empower Lives</Text>
-        <DonationCard
+        <Card
           imageSource={cardimg} // Replace with your image path
           title="Education Support"
           description="Providing access to quality education and learning resources for underprivileged children."
           raised={45.0}
           goal={120.0}
         />
-        <DonationCard
+        <Card
           imageSource={cardimg2} // Replace with your image path
           title="Education Support"
           description="Providing access to quality education and learning resources for underprivileged children."
           raised={45.0}
           goal={120.0}
         />
-        <DonationCard
+        <Card
           imageSource={cardimg3} // Replace with your image path
           title="Education Support"
           description="Providing access to quality education and learning resources for underprivileged children."
           raised={45.0}
           goal={120.0}
         />
-        <DonationCard
+        <Card
           imageSource={cardimg4} // Replace with your image path
           title="Education Support"
           description="Providing access to quality education and learning resources for underprivileged children."
