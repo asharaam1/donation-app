@@ -3,16 +3,33 @@
 // export default function NeedyLayout() {
 //   return <Stack />;
 // }
+import { Ionicons } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
+import DonorHeader from '../../../components/CustomHeader';
 
 export default function DonorLayout() {
   return (
-    <Tabs screenOptions={{ headerShown: false }}>
+    <Tabs
+      screenOptions={{
+        tabBarStyle: {
+          backgroundColor: "#000000",
+          borderRadius: 25,
+          marginBottom: 20,
+          marginHorizontal: 20,
+        },
+        tabBarActiveTintColor: "#FF5F15",
+        tabBarInactiveTintColor: "#666",
+      }}
+    >
       <Tabs.Screen
         name="index"
         options={{
-          title: 'index',
-          tabBarLabel: 'index'
+          headerShown: true,
+          header: () => <DonorHeader head="Needy"/>,
+          tabBarIcon: ({ size }) => (
+            <Ionicons name="home-outline" size={size} color="#FF5F15" />
+          ),
+          tabBarLabel: "Home",
         }}
       />
       <Tabs.Screen
@@ -34,6 +51,13 @@ export default function DonorLayout() {
         options={{
           title: 'profile',
           tabBarLabel: 'profile'
+        }}
+      />
+      <Tabs.Screen
+        name="dashboard"
+        options={{
+          title: 'dashboard',
+          tabBarLabel: 'dashboard'
         }}
       />
     </Tabs>

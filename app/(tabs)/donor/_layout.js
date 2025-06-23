@@ -34,7 +34,7 @@ const _layout = () => {
         name="index"
         options={{
           headerShown: true,
-          header: () => <DonorHeader />,
+          header: () => <DonorHeader head="Donor" />,
           tabBarIcon: ({ size }) => (
             <Ionicons name="home-outline" size={size} color="#FF5F15" />
           ),

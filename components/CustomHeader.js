@@ -7,7 +7,7 @@ import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import logo from "../assets/images/logo.png";
 import { auth, db } from "../Firebase/config";
 
-const DonorHeader = () => {
+const DonorHeader = ({head}) => {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -47,7 +47,7 @@ const DonorHeader = () => {
       </TouchableOpacity>
 
       {/* Center: Title */}
-      <Text style={styles.title}>Donor</Text>
+      <Text style={styles.title}>{head}</Text>
 
       {/* Right: Profile Image */}
       <TouchableOpacity style={styles.profileContainer} onPress={() => router.push("/profile")}>
