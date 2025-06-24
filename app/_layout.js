@@ -75,6 +75,9 @@ function RootLayoutContent() {
       {/* <Stack.Screen name="signup" options={{ headerShown: false }} /> */}
       {/* <Stack.Screen name="donor" options={{ headerShown: false }} /> */}
       {/* <Stack.Screen name="profile" options={{ headerShown: false }} /> */}
+      
+
+      
       <Stack.Screen
         name="personalinfo"
         options={{ headerShown: true, title: "Personal Info" }}

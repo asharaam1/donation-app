@@ -12,7 +12,6 @@ const handleLogout = () => {
       router.push("/");
     })
     .catch((error) => {
-      // Handle error if needed
     });
 };
 
