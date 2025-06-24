@@ -33,14 +33,11 @@ const _layout = () => {
       <Tabs.Screen
         name="index"
         options={{
+          tabBarItem: { showIcon: false, showLabel: false },
           headerShown: false,
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="home" size={size} color={color} />
-          ),
-          tabBarLabel: "Dashboard",
         }}
       />
-      <Tabs.Screen
+      {/* <Tabs.Screen
         name="signup"
         options={{
           headerShown: false,
@@ -49,8 +46,8 @@ const _layout = () => {
           ),
           tabBarLabel: "Sign Up",
         }}
-      />
-      <Tabs.Screen
+      /> */}
+      {/* <Tabs.Screen
         name="donor"
         options={{
           headerShown: true,
@@ -60,9 +57,9 @@ const _layout = () => {
           ),
           tabBarLabel: "Donor",
         }}
-      />
+      /> */}
       <Tabs.Screen
-        name="Give"
+        name="give"
         options={{
           headerShown: false,
           tabBarIcon: ({ color }) => (
@@ -74,7 +71,7 @@ const _layout = () => {
         }}
       />
       <Tabs.Screen
-        name="profile"
+        name="Profile"
         options={{
           headerShown: true,
           title: "Profile",
@@ -96,21 +93,15 @@ const _layout = () => {
       <Tabs.Screen
         name="personalinfo"
         options={{
+          tabBarItem: { showIcon: false, showLabel: false },
           headerShown: false,
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="information-circle-outline" size={size} color={color} />
-          ),
-          tabBarLabel: "Info",
         }}
       />
       <Tabs.Screen
         name="address"
         options={{
+          tabBarItem: { showIcon: false, showLabel: false },
           headerShown: false,
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="location-outline" size={size} color={color} />
-          ),
-          tabBarLabel: "Address",
         }}
       />
     </Tabs>
