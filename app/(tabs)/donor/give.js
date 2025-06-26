@@ -29,6 +29,7 @@ export default function GiveDonation() {
           title: d.title,
           status: d.status,
           createdAt: d.createdAt,
+          description: d.description,
         };
       });
       setData(fetchedData);
@@ -65,6 +66,7 @@ export default function GiveDonation() {
                       title={item.title}
                       status={item.status}
                       createat={item.createdAt}
+                      description={item.description}
                       id={item.id}
                     />
                   </View>

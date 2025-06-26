@@ -3,8 +3,8 @@ import { router, Tabs } from "expo-router";
 import { signOut } from "firebase/auth";
 import React from "react";
 import { StyleSheet, View } from "react-native";
-import DonorHeader from "../../../components/CustomHeader";
 import { auth } from "../../../Firebase/config";
+import CustomHeader from "../../../components/CustomHeader";
 
 const handleLogout = () => {
   signOut(auth)
@@ -29,13 +29,13 @@ const _layout = () => {
         tabBarInactiveTintColor: "#666",
       }}
     >
-      <Tabs.Screen
+      {/* <Tabs.Screen
         name="index"
         options={{
           tabBarItem: { showIcon: false, showLabel: false },
           headerShown: false,
         }}
-      />
+      /> */}
       {/* <Tabs.Screen
         name="signup"
         options={{
@@ -46,21 +46,23 @@ const _layout = () => {
           tabBarLabel: "Sign Up",
         }}
       /> */}
-      {/* <Tabs.Screen
-        name="donor"
+      <Tabs.Screen
+        name="index"
         options={{
           headerShown: true,
-          header: () => <DonorHeader />,
+          header: () => <CustomHeader />,
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="heart-outline" size={size} color={color} />
+            <Ionicons name="home-outline" size={size} color={color} />
+
           ),
           tabBarLabel: "Donor",
         }}
-      /> */}
+      />
       <Tabs.Screen
         name="give"
         options={{
           headerShown: false,
+           header: () => <CustomHeader />,
           tabBarIcon: ({ color }) => (
             <View style={{ marginBottom: 10 }}>
               <Ionicons name="add-circle-outline" size={40} color={color} />
@@ -103,6 +105,13 @@ const _layout = () => {
           headerShown: false,
         }}
       />
+      <Tabs.Screen
+        name="DonorHistory"
+        options={{
+          tabBarItem: { showIcon: false, showLabel: false },
+          headerShown: false,
+        }}
+        />
     </Tabs>
   );
 };

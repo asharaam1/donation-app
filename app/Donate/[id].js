@@ -12,10 +12,12 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from "react-native";
-import { doc, getDoc } from "firebase/firestore";
-import { db } from "../../Firebase/config";
+import { doc, getDoc, addDoc, collection } from "firebase/firestore";
+import { db, auth } from "../../Firebase/config";
 import { Stack, useLocalSearchParams } from "expo-router";
 import { Feather } from "@expo/vector-icons";
+import { onAuthStateChanged } from "firebase/auth";
+import { updateDoc } from "firebase/firestore";
 
 const DetailPage = () => {
   const { id } = useLocalSearchParams();
@@ -25,15 +27,60 @@ const DetailPage = () => {
 
   const [donationAmount, setDonationAmount] = useState("");
   const [donationMessage, setDonationMessage] = useState("");
+  const [donorId, setdonorId] = useState();
+  const [userData, setUserData] = useState({});
+  const [donorName, setDonorName] = useState("");
+  const [needyName, setNeedyName] = useState("");
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      onAuthStateChanged(auth, async (user) => {
+        if (user) {
+          const uid = user.uid;
+          setdonorId(uid);
+
+          const userRef = doc(db, "users", uid);
+          const userSnap = await getDoc(userRef);
+
+          if (userSnap.exists()) {
+            const data = userSnap.data();
+            setUserData(data);
+            setDonorName(data.fullName || "Anonymous");
+          }
+        }
+      });
+    };
+
+    fetchUserData();
+  }, []);
 
   useEffect(() => {
     if (!id) return;
     const fetchData = async () => {
       try {
         const snap = await getDoc(doc(db, "fundRequests", id));
+
         if (snap.exists()) {
           const data = snap.data();
           setRequestData(data);
+
+          // Fetch needy user's name
+          if (data.userId) {
+            try {
+              const needyRef = doc(db, "users", data.userId);
+              const needySnap = await getDoc(needyRef);
+              if (needySnap.exists()) {
+                const needyData = needySnap.data();
+                setNeedyName(needyData.fullName || "Unknown User");
+              } else {
+                setNeedyName("Unknown User");
+              }
+            } catch (err) {
+              console.error("Error fetching needy data:", err);
+              setNeedyName("Unknown User");
+            }
+          }
+
           Animated.parallel([
             Animated.timing(fadeAnim, {
               toValue: 1,
@@ -50,26 +97,53 @@ const DetailPage = () => {
           ]).start();
         }
       } catch (err) {
-        console.error("Error fetching:", err);
+        console.error("Error fetching fund data:", err);
       }
     };
     fetchData();
   }, [id]);
 
-  const handleSendDonation = () => {
+  const SendDonation = async () => {
     if (!donationAmount) {
       alert("Please enter a donation amount.");
       return;
     }
 
-    console.log("Donation Sent:", {
-      amount: donationAmount,
-      message: donationMessage,
-    });
+    const donationAmt = parseFloat(donationAmount);
 
-    setDonationAmount("");
-    setDonationMessage("");
-    alert("Thank you for your donation!");
+    try {
+      const docRef = await addDoc(collection(db, "donations"), {
+        donorId: donorId,
+        donorName: donorName,
+        needyid: id,
+        needyName: needyName,
+        amount: donationAmt,
+        message: donationMessage,
+        createdAt: Date.now(),
+      });
+
+      const requestRef = doc(db, "fundRequests", id);
+      const snap = await getDoc(requestRef);
+      if (snap.exists()) {
+        const currentRaised = snap.data().amountRaised || 0;
+        await updateDoc(requestRef, {
+          amountRaised: currentRaised + donationAmt,
+        });
+
+        // Update UI immediately
+        setRequestData((prev) => ({
+          ...prev,
+          amountRaised: currentRaised + donationAmt,
+        }));
+      }
+
+      alert("Donation sent successfully!");
+      setDonationAmount("");
+      setDonationMessage("");
+    } catch (e) {
+      console.error("Error sending donation:", e);
+      alert("Failed to send donation.");
+    }
   };
 
   if (!requestData) {
@@ -87,9 +161,8 @@ const DetailPage = () => {
     description,
     amountRaised = 0,
     amountRequested = 0,
-    status = "pending",
+    // status = "pending",
     createdAt,
-    userId = "Unknown",
   } = requestData;
 
   const progress = amountRequested > 0 ? amountRaised / amountRequested : 0;
@@ -111,16 +184,13 @@ const DetailPage = () => {
       behavior={Platform.OS === "ios" ? "padding" : undefined}
       style={{ flex: 1 }}
     >
-      <Stack.Screen options={{ title: "Fund Detials", headerShown: true }} />
+      <Stack.Screen options={{ title: "Fund Details", headerShown: true }} />
       <ScrollView
         style={styles.container}
         contentContainerStyle={{ paddingBottom: 40 }}
       >
         <Animated.View
-          style={{
-            opacity: fadeAnim,
-            transform: [{ scale: scaleAnim }],
-          }}
+          style={{ opacity: fadeAnim, transform: [{ scale: scaleAnim }] }}
         >
           {blogImg ? (
             <Animated.Image source={{ uri: blogImg }} style={styles.image} />
@@ -143,10 +213,10 @@ const DetailPage = () => {
 
               <View style={styles.metaItem}>
                 <Feather name="user" size={18} color="#ff4500" />
-                <Text style={styles.metaText}> {userId}</Text>
+                <Text style={styles.metaText}> {needyName}</Text>
               </View>
 
-              <View
+              {/* <View
                 style={[
                   styles.statusBadge,
                   {
@@ -168,7 +238,7 @@ const DetailPage = () => {
                   {" "}
                   {status.charAt(0).toUpperCase() + status.slice(1)}
                 </Text>
-              </View>
+              </View> */}
             </View>
 
             <View style={styles.amountContainer}>
@@ -194,7 +264,6 @@ const DetailPage = () => {
             </View>
             <Text style={styles.percentage}>{percentage}% Funded</Text>
 
-            {/* Donation Form */}
             <View style={styles.formContainer}>
               <Text style={styles.formTitle}>Make a Donation</Text>
               <Text style={styles.formSubtitle}>
@@ -218,10 +287,7 @@ const DetailPage = () => {
                 onChangeText={setDonationMessage}
               />
 
-              <TouchableOpacity
-                style={styles.button}
-                onPress={handleSendDonation}
-              >
+              <TouchableOpacity style={styles.button} onPress={SendDonation}>
                 <Text style={styles.buttonText}>SEND DONATION →</Text>
               </TouchableOpacity>
             </View>

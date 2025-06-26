@@ -86,6 +86,10 @@ function RootLayoutContent() {
         name="address"
         options={{ headerShown: true, title: "Address" }}
       />
+      <Stack.Screen
+        name="DonorHistory"
+        options={{ headerShown: true, title: "My Donations" }}
+      />
     </Stack>
   );
 }

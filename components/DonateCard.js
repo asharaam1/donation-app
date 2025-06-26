@@ -3,7 +3,7 @@ import React from "react";
 import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
 import ProgressBar from "react-native-progress/Bar";
 
-const EmergencyCard = ({ img, amountraise, requestedamm, title, status, createat ,id }) => {
+const EmergencyCard = ({ img, amountraise, requestedamm, title, status, createat ,id ,description}) => {
   const progress = requestedamm > 0 ? amountraise / requestedamm : 0;
   const readableDate = createat?.toDate?.().toLocaleDateString("en-GB") || "Unknown";
 
@@ -12,9 +12,7 @@ const EmergencyCard = ({ img, amountraise, requestedamm, title, status, createat
       <Image source={{ uri: img }} style={styles.image} />
       <Text style={styles.title}>{title}</Text>
       <Text style={styles.description}>
-        {status === 'active'
-          ? 'A sudden medical emergency has put us in a tough spot. We urgently need...'
-          : "I'm struggling..."}
+        {description.length > 100 ? description.slice(0, 100) + "..." : description}
       </Text>
       <View style={styles.progressContainer}>
         <Text style={styles.raisedText}>Raised: Rs {amountraise}</Text>

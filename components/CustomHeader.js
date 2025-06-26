@@ -7,7 +7,7 @@ import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import logo from "../assets/images/logo.png";
 import { auth, db } from "../Firebase/config";
 
-const DonorHeader = ({head}) => {
+const CustomHeader = ({head}) => {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -114,4 +114,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default DonorHeader;
+export default CustomHeader;
