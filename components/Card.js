@@ -1,6 +1,6 @@
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-export const DonationCard = ({
+export const Card = ({
   imageSource,
   title,
   description,
@@ -30,7 +30,7 @@ export const DonationCard = ({
   );
 };
 
-export default DonationCard;
+export default Card;
 
 const styles = StyleSheet.create({
   donationCardContainer: {

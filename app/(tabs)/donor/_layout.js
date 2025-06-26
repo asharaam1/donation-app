@@ -3,8 +3,8 @@ import { router, Tabs } from "expo-router";
 import { signOut } from "firebase/auth";
 import React from "react";
 import { StyleSheet, View } from "react-native";
-import DonorHeader from "../../../components/CustomHeader";
 import { auth } from "../../../Firebase/config";
+import CustomHeader from "../../../components/CustomHeader";
 
 const handleLogout = () => {
   signOut(auth)
@@ -12,7 +12,6 @@ const handleLogout = () => {
       router.push("/");
     })
     .catch((error) => {
-      // An error happened.
     });
 };
 
@@ -30,42 +29,43 @@ const _layout = () => {
         tabBarInactiveTintColor: "#666",
       }}
     >
-      <Tabs.Screen
-        name="index"
-        options={{
-          headerShown: true,
-          header: () => <DonorHeader head="Donor" />,
-          tabBarIcon: ({ size }) => (
-            <Ionicons name="home-outline" size={size} color="#FF5F15" />
-          ),
-          tabBarLabel: "Home",
-        }}
-      />
       {/* <Tabs.Screen
-        name="signup"
+        name="index"
         options={{
           tabBarItem: { showIcon: false, showLabel: false },
           headerShown: false,
         }}
       /> */}
       {/* <Tabs.Screen
-        name="donor"
+        name="signup"
         options={{
-          headerShown: true,
-          header: () => <DonorHeader />,
-          tabBarIcon: ({ size }) => (
-            <Ionicons name="home-outline" size={size} color="#FF5F15" />
+          headerShown: false,
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="person-add-outline" size={size} color={color} />
           ),
-          tabBarLabel: "Home",
+          tabBarLabel: "Sign Up",
         }}
       /> */}
+      <Tabs.Screen
+        name="index"
+        options={{
+          headerShown: true,
+          header: () => <CustomHeader />,
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="home-outline" size={size} color={color} />
+
+          ),
+          tabBarLabel: "Donor",
+        }}
+      />
       <Tabs.Screen
         name="give"
         options={{
           headerShown: false,
-          tabBarIcon: ({ size }) => (
+           header: () => <CustomHeader />,
+          tabBarIcon: ({ color }) => (
             <View style={{ marginBottom: 10 }}>
-              <Ionicons name="add-circle-outline" size={40} color="#FF5F15" />
+              <Ionicons name="add-circle-outline" size={40} color={color} />
             </View>
           ),
           tabBarLabel: "Give",
@@ -76,8 +76,8 @@ const _layout = () => {
         options={{
           headerShown: true,
           title: "Profile",
-          tabBarIcon: ({ size }) => (
-            <Ionicons name="person-outline" size={size} color="#FF5F15" />
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="person-outline" size={size} color={color} />
           ),
           tabBarLabel: "Profile",
           headerRight: () => (
@@ -91,6 +91,27 @@ const _layout = () => {
           ),
         }}
       />
+      <Tabs.Screen
+        name="personalinfo"
+        options={{
+          tabBarItem: { showIcon: false, showLabel: false },
+          headerShown: false,
+        }}
+      />
+      <Tabs.Screen
+        name="address"
+        options={{
+          tabBarItem: { showIcon: false, showLabel: false },
+          headerShown: false,
+        }}
+      />
+      <Tabs.Screen
+        name="DonorHistory"
+        options={{
+          tabBarItem: { showIcon: false, showLabel: false },
+          headerShown: false,
+        }}
+        />
     </Tabs>
   );
 };

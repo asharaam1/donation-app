@@ -13,30 +13,23 @@ import {
 } from "react-native";
 import Swiper from "react-native-swiper";
 import carouselImage1 from "../../../assets/images/carosuel-1.jpg";
-import cardimg from "../../../assets/images/Donationcard1.jpg";
-import cardimg2 from "../../../assets/images/Donationcard2.jpg";
-import cardimg3 from "../../../assets/images/Donationcard3.jpg";
-import cardimg4 from "../../../assets/images/Donationcard4.webp";
 import {
   default as carouselImage2,
   default as carouselImage4,
 } from "../../../assets/images/donationpagebanner-copy.jpg";
 import carouselImage3 from "../../../assets/images/poverty_2226036b.webp";
-import { DonationCard } from "../../../components/DonationCard.js";
 import Testimonial from "../../../components/Testimonials.js";
 import { auth } from "../../../Firebase/config.js";
-
-// DonationCard Component
-
-// TestimonialCard Component
-
-// TestimonialSection Component
+import { Card } from "../../../components/Card.js";
+import cardimg from "../../../assets/images/Donationcard1.jpg";
+import cardimg2 from "../../../assets/images/Donationcard2.jpg";
+import cardimg3 from "../../../assets/images/Donationcard3.jpg";
+import cardimg4 from "../../../assets/images/Donationcard4.webp";
 
 const DonorScreen = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Donation options
   const donationOptions = [
     { amount: 100, currency: "₹" },
     { amount: 500, currency: "₹" },
@@ -47,22 +40,14 @@ const DonorScreen = () => {
   ];
 
   useEffect(() => {
-    // Simulate loading data
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 2000);
 
     onAuthStateChanged(auth, (user) => {
       if (user) {
-        console.log("User is logged in");
-        router.push("/donor");
+        setLoading(false);
       } else {
-        console.log("User is logged out");
-        // router.push("/");
+        router.push("/");
       }
     });
-
-    return () => clearTimeout(timer);
   }, []);
 
   if (loading) {
@@ -197,28 +182,28 @@ const DonorScreen = () => {
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Together We Can Empower Lives</Text>
-        <DonationCard
+        <Card
           imageSource={cardimg} // Replace with your image path
           title="Education Support"
           description="Providing access to quality education and learning resources for underprivileged children."
           raised={45.0}
           goal={120.0}
         />
-        <DonationCard
+        <Card
           imageSource={cardimg2} // Replace with your image path
           title="Education Support"
           description="Providing access to quality education and learning resources for underprivileged children."
           raised={45.0}
           goal={120.0}
         />
-        <DonationCard
+        <Card
           imageSource={cardimg3} // Replace with your image path
           title="Education Support"
           description="Providing access to quality education and learning resources for underprivileged children."
           raised={45.0}
           goal={120.0}
         />
-        <DonationCard
+        <Card
           imageSource={cardimg4} // Replace with your image path
           title="Education Support"
           description="Providing access to quality education and learning resources for underprivileged children."

@@ -95,7 +95,10 @@ function Profile() {
             />
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.menuItem}>
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={() => router.push("/DonorHistory")}
+          >
             <MaterialIcons
               name="card-giftcard"
               size={24}
