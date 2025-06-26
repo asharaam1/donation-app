@@ -7,7 +7,7 @@ import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import logo from "../assets/images/logo.png";
 import { auth, db } from "../Firebase/config";
 
-const CustomHeader = ({head}) => {
+const CustomHeader = ({ head }) => {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -19,23 +19,17 @@ const CustomHeader = ({head}) => {
           const userSnap = await getDoc(userRef);
           if (userSnap.exists()) {
             setUserData(userSnap.data());
-            console.log("User data fetched:", userSnap.data());
           } else {
-            console.log("No user data found");
             setUserData(null);
           }
         } catch (error) {
-          console.error("Error fetching user data:", error);
           setUserData(null);
         }
       } else {
-        console.log("No user logged in");
         setUserData(null);
       }
       setLoading(false);
     });
-
-    // Cleanup subscription on unmount
     return () => unsubscribe();
   }, []);
 

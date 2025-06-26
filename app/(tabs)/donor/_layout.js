@@ -50,7 +50,7 @@ const _layout = () => {
         name="index"
         options={{
           headerShown: true,
-          header: () => <CustomHeader />,
+          header: () => <CustomHeader head="Donor" />,
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="home-outline" size={size} color={color} />
 
@@ -62,7 +62,7 @@ const _layout = () => {
         name="give"
         options={{
           headerShown: false,
-           header: () => <CustomHeader />,
+          header: () => <CustomHeader head="Donor" userRole="/donor" profile="/profile"/>,
           tabBarIcon: ({ color }) => (
             <View style={{ marginBottom: 10 }}>
               <Ionicons name="add-circle-outline" size={40} color={color} />
@@ -111,7 +111,7 @@ const _layout = () => {
           tabBarItem: { showIcon: false, showLabel: false },
           headerShown: false,
         }}
-        />
+      />
     </Tabs>
   );
 };

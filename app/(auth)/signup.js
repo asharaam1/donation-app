@@ -77,22 +77,17 @@ export default function Signup() {
 
   const signup = async () => {
     if (!role || !fullName || !email || !password || !confirmPassword) {
-      console.log("Please fill in all required fields.");
       return;
     }
-
     if (password !== confirmPassword) {
-      console.log("Passwords do not match.");
       return;
     }
-
     setUploading(true);
     let imageUrl = null;
     if (image) {
       imageUrl = await uploadImageToCloudinary(image);
     }
     setUploading(false);
-
     try {
       const userCredential = await createUserWithEmailAndPassword(
         auth,
@@ -115,14 +110,12 @@ export default function Signup() {
       await setDoc(doc(db, "users", user.uid), obj );
       AsyncStorage.setItem('uid', user.id);
       AsyncStorage.setItem('user', JSON.stringify(obj))
-
-      console.log("User registered and data saved.");
       if (role === "donor") {
         router.push("/donor");
       } else if (role === "needy") {
         router.push("/needy");
       } else {
-        router.push("/"); // fallback
+        router.push("/");
       }
     } catch (error) {
       console.error("Signup error:", error.message);

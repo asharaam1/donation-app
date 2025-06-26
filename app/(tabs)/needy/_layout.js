@@ -5,7 +5,7 @@
 // }
 import { Ionicons } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
-import DonorHeader from '../../../components/CustomHeader';
+import CustomHeader from '../../../components/CustomHeader';
 
 export default function DonorLayout() {
   return (
@@ -25,7 +25,7 @@ export default function DonorLayout() {
         name="index"
         options={{
           headerShown: true,
-          header: () => <DonorHeader head="Needy"/>,
+          header: () => <CustomHeader head="Needy" userRole="/needy" profile="/profile" />,
           tabBarIcon: ({ size }) => (
             <Ionicons name="home-outline" size={size} color="#FF5F15" />
           ),
@@ -39,25 +39,26 @@ export default function DonorLayout() {
           tabBarLabel: 'fundraise'
         }}
       />
-      <Tabs.Screen
-        name="kycVerify"
-        options={{
-          title: 'kycVerify',
-          tabBarLabel: 'kycVerify'
-        }}
-      />
-      <Tabs.Screen
-        name="profile"
-        options={{
-          title: 'profile',
-          tabBarLabel: 'profile'
-        }}
-      />
+
       <Tabs.Screen
         name="dashboard"
         options={{
           title: 'dashboard',
           tabBarLabel: 'dashboard'
+        }}
+      />
+      <Tabs.Screen
+        name="kycVerify"
+        options={{
+          tabBarItem: { showIcon: false, showLabel: false },
+          headerShown: false,
+        }}
+      />
+      <Tabs.Screen
+        name="profile"
+        options={{
+          tabBarItem: { showIcon: false, showLabel: false },
+          headerShown: false,
         }}
       />
     </Tabs>

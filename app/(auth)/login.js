@@ -1,8 +1,8 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
-import { onAuthStateChanged } from "firebase/auth";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   Image,
   StyleSheet,
@@ -13,44 +13,21 @@ import {
 } from "react-native";
 import logo from "../../assets/images/logo.png"; // updated relative path
 import { auth, db } from "../../Firebase/config"; // also update path if needed
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  // const [loading, setLoading] = useState(false);
-  // const [Timeout, setTimeout] = useState(null);
 
-
-  // useEffect(() => {
-  //   // Check if user is already logged in 
-  //   onAuthStateChanged(auth, (user) => {
-  //     if (user) {
-  //       router.push("/(tabs)/donor");
-  //     }
-  //   });
-  //   })
-
-
-
-
-  // This is a no-op edit to force re-evaluation
   const login = async () => {
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
-
-      // Get user data from Firestore
       const userRef = doc(db, "users", user.uid);
       AsyncStorage.setItem('uid', user.uid)
       const userSnap = await getDoc(userRef);
-
       if (userSnap.exists()) {
         const userData = userSnap.data();
-        // Navigate based on user role
-        console.log(userData)
-
         if (userData.role === 'donor') {
           router.replace("/(tabs)/donor");
         } else if (userData.role === 'needy') {
@@ -62,7 +39,6 @@ export default function Login() {
         setError("User data not found");
       }
     } catch (error) {
-      console.log(error.message);
       setError("Invalid Email or Password");
     }
   };

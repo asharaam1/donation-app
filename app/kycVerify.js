@@ -1,9 +1,9 @@
-import React, { useEffect, useRef, useState } from "react";
-import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity } from "react-native";
 import * as ImagePicker from "expo-image-picker";
-import { addDoc, collection, doc, getDoc, getDocs, query, setDoc, where } from "firebase/firestore";
-import { auth, db } from "../../../Firebase/config";
 import { router } from "expo-router";
+import { collection, doc, getDoc, getDocs, query, setDoc, where } from "firebase/firestore";
+import React, { useEffect, useState } from "react";
+import { ActivityIndicator, Alert, Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { auth, db } from "../Firebase/config";
 
 const RaiseFundScreen = () => {
   const [loading, setLoading] = useState(true);
@@ -14,11 +14,11 @@ const RaiseFundScreen = () => {
   const [mobile, setMobile] = useState("");
   const [kycLoading, setKycLoading] = useState(false);
 
-  const [fundTitle, setFundTitle] = useState("");
-  const [fundAmount, setFundAmount] = useState("");
-  const [fundDescription, setFundDescription] = useState("");
-  const [blogImgFile, setBlogImgFile] = useState(null);
-  const [fundLoading, setFundLoading] = useState(false);
+  // const [fundTitle, setFundTitle] = useState("");
+  // const [fundAmount, setFundAmount] = useState("");
+  // const [fundDescription, setFundDescription] = useState("");
+  // const [blogImgFile, setBlogImgFile] = useState(null);
+  // const [fundLoading, setFundLoading] = useState(false);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -49,7 +49,7 @@ const RaiseFundScreen = () => {
     if (!result.canceled) {
       const file = result.assets[0].uri;
       console.log("Selected image file:", file);
-      setImage(file);
+      setImage({ uri: file });
     }
   };
 
@@ -116,7 +116,7 @@ const RaiseFundScreen = () => {
         uploadToCloudinary(cnicBack.uri),
       ]);
 
-      const obj =  {
+      const obj = {
         userId: user.uid,
         cnicFrontUrl: frontUrl,
         cnicBackUrl: backUrl,
@@ -150,21 +150,23 @@ const RaiseFundScreen = () => {
       ) : userData.kycStatus !== "approved" ? (
         <>
           <Text style={styles.title}>KYC Verification</Text>
-          {/* <TouchableOpacity style={styles.inputBox} onPress={() => pickImage(setCnicFront)}>
-            <Text>Select CNIC Front</Text>
-          </TouchableOpacity> */}
-{/* Pending work */}
           <TouchableOpacity onPress={() => pickImage(setCnicFront)}>
-              <View style={styles.imagePicker}>
-                {image ? (
-                  <Image source={{ uri: image }} style={styles.previewImage} />
-                ) : (
-                  <Text style={{ color: "#666", textAlign:'center' }}>Pick Cnic Front Image</Text>
-                )}
-              </View>
-            </TouchableOpacity>
-          <TouchableOpacity style={styles.inputBox} onPress={() => pickImage(setCnicBack)}>
-            <Text>Select CNIC Back</Text>
+            <View style={styles.imagePicker}>
+              {cnicFront ? (
+                <Image source={{ uri: cnicFront.uri }} style={styles.previewImage} />
+              ) : (
+                <Text style={{ color: "#666", textAlign: 'center' }}>Pick Cnic Front Image</Text>
+              )}
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => pickImage(setCnicBack)}>
+            <View style={styles.imagePicker}>
+              {cnicBack ? (
+                <Image source={{ uri: cnicBack.uri }} style={styles.previewImage} />
+              ) : (
+                <Text style={{ color: "#666", textAlign: 'center' }}>Pick Cnic Back Image</Text>
+              )}
+            </View>
           </TouchableOpacity>
           <TextInput style={styles.inputBox} placeholder="Full Address" value={address} onChangeText={setAddress} />
           <TextInput style={styles.inputBox} placeholder="Mobile Number (03XXXXXXXXX)" value={mobile} onChangeText={setMobile} keyboardType="phone-pad" />
@@ -218,6 +220,22 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#fff',
     fontWeight: 'bold',
+  },
+  imagePicker: {
+    height: 150,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 10,
+    marginBottom: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    overflow: 'hidden',
+    backgroundColor: '#fafafa',
+  },
+  previewImage: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
   },
 });
 

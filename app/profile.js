@@ -11,7 +11,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { auth, db } from "../../../Firebase/config.js";
+import { auth, db } from "../Firebase/config.js";
 
 function Profile() {
   const router = useRouter();

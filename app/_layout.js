@@ -70,14 +70,8 @@ function RootLayoutContent() {
         <Redirect href="/(auth)/login" /> // Fallback if role is not set or invalid
       )}
 
-      {/* <Stack.Screen name="(tabs)" options={{ headerShown: false }} /> */}
-      {/* <Stack.Screen name="index" options={{ headerShown: false }} /> */}
-      {/* <Stack.Screen name="signup" options={{ headerShown: false }} /> */}
-      {/* <Stack.Screen name="donor" options={{ headerShown: false }} /> */}
-      {/* <Stack.Screen name="profile" options={{ headerShown: false }} /> */}
-      
+ 
 
-      
       <Stack.Screen
         name="personalinfo"
         options={{ headerShown: true, title: "Personal Info" }}
@@ -89,6 +83,14 @@ function RootLayoutContent() {
       <Stack.Screen
         name="DonorHistory"
         options={{ headerShown: true, title: "My Donations" }}
+      />
+      <Stack.Screen
+        name="kycVerify"
+        options={{ headerShown: true, title: "Verify KYC" }}
+      />
+      <Stack.Screen
+        name="profile"
+        options={{ headerShown: true, title: "My Profile" }}
       />
     </Stack>
   );
