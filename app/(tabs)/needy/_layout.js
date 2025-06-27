@@ -6,6 +6,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
 import CustomHeader from '../../../components/CustomHeader';
+import { View } from 'react-native-web';
 
 export default function DonorLayout() {
   return (
@@ -35,11 +36,15 @@ export default function DonorLayout() {
       <Tabs.Screen
         name="fundraise"
         options={{
-          title: 'fundraise',
-          tabBarLabel: 'fundraise'
+          headerShown: true,
+          tabBarIcon: ({ size }) => (
+            <View style={{ marginBottom: 10 }}>
+              <Ionicons name="add-circle-outline" size={size} color="#FF5F15" />
+            </View>
+          ),
+          tabBarLabel: "Raise Fund",
         }}
       />
-
       <Tabs.Screen
         name="dashboard"
         options={{
@@ -47,6 +52,9 @@ export default function DonorLayout() {
           tabBarLabel: 'dashboard'
         }}
       />
+
+
+
       <Tabs.Screen
         name="kycVerify"
         options={{
