@@ -1,12 +1,7 @@
+import { router } from "expo-router";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-export const Card = ({
-  imageSource,
-  title,
-  description,
-  raised,
-  goal,
-}) => {
+export const Card = ({ imageSource, title, description, raised, goal }) => {
   const progress = (raised / goal) * 100;
 
   return (
@@ -22,7 +17,11 @@ export const Card = ({
         <View style={styles.progressBar}>
           <View style={[styles.progressFill, { width: `${progress}%` }]} />
         </View>
-        <TouchableOpacity style={styles.cardDonateButton} activeOpacity={0.8}>
+        <TouchableOpacity
+          style={styles.cardDonateButton}
+          activeOpacity={0.8}
+          onPress={() => router.push("donor/give")}
+        >
           <Text style={styles.cardDonateButtonText}>DONATE NOW →</Text>
         </TouchableOpacity>
       </View>
@@ -34,16 +33,18 @@ export default Card;
 
 const styles = StyleSheet.create({
   donationCardContainer: {
+    width: 300, // fixed width (adjust for screen size if needed)
+    marginHorizontal: 8,
     backgroundColor: "#fff",
     borderRadius: 10,
     overflow: "hidden",
-    margin: 10,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 2,
   },
+
   cardImage: {
     width: "100%",
     height: 200,

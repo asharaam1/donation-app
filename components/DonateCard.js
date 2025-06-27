@@ -3,16 +3,31 @@ import React from "react";
 import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native";
 import ProgressBar from "react-native-progress/Bar";
 
-const EmergencyCard = ({ img, amountraise, requestedamm, title, status, createat ,id ,description}) => {
+const EmergencyCard = ({
+  img,
+  amountraise,
+  requestedamm,
+  title,
+  status,
+  createat,
+  id,
+  description,
+}) => {
   const progress = requestedamm > 0 ? amountraise / requestedamm : 0;
-  const readableDate = createat?.toDate?.().toLocaleDateString("en-GB") || "Unknown";
+  const readableDate =
+    createat?.toDate?.().toLocaleDateString("en-GB") || "Unknown";
 
   return (
-    <TouchableOpacity style={styles.card} onPress={() => router.push(`Donate/${id}`)}>
+    <TouchableOpacity
+      style={styles.card}
+      onPress={() => router.push(`Donate/${id}`)}
+    >
       <Image source={{ uri: img }} style={styles.image} />
       <Text style={styles.title}>{title}</Text>
       <Text style={styles.description}>
-        {description.length > 100 ? description.slice(0, 100) + "..." : description}
+        {description.length > 100
+          ? description.slice(0, 100) + "..."
+          : description}
       </Text>
       <View style={styles.progressContainer}>
         <Text style={styles.raisedText}>Raised: Rs {amountraise}</Text>

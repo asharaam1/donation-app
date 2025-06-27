@@ -1,8 +1,8 @@
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import { onAuthStateChanged } from "firebase/auth";
+import { onAuthStateChanged, signOut } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Image,
   ScrollView,
@@ -11,6 +11,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
 import { auth, db } from "../Firebase/config";
 
 export default function PersonalInfo() {
@@ -37,126 +38,151 @@ export default function PersonalInfo() {
     return () => unsubscribe();
   }, []);
 
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      router.push("/");
+    } catch (error) {
+      console.error("Logout Error:", error.message);
+    }
+  };
+
   return (
-    <ScrollView
+    <LinearGradient
+      colors={["#ffffff", "#fff0e0", "#ffe0cc", "#FF5F15"]}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 0, y: 1 }}
       style={styles.container}
-      contentContainerStyle={{ alignItems: "center", paddingBottom: 40 }}
     >
-      <View style={styles.avatarWrapper}>
-        {userData?.profileImageUrl ? (
-          <Image
-            source={{ uri: userData.profileImageUrl }}
-            style={styles.avatar}
-          />
-        ) : (
-          <View
-            style={[
-              styles.avatar,
-              {
-                backgroundColor: "#eee",
-                justifyContent: "center",
-                alignItems: "center",
-              },
-            ]}
-          >
-            <Ionicons name="person" size={60} color="#FF5F15" />
+      <ScrollView
+        contentContainerStyle={{ alignItems: "center", paddingBottom: 60 }}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.avatarWrapper}>
+          {userData?.profileImageUrl ? (
+            <Image
+              source={{ uri: userData.profileImageUrl }}
+              style={styles.avatar}
+            />
+          ) : (
+            <View
+              style={[
+                styles.avatar,
+                {
+                  backgroundColor: "#eee",
+                  justifyContent: "center",
+                  alignItems: "center",
+                },
+              ]}
+            >
+              <Ionicons name="person" size={60} color="#FF5F15" />
+            </View>
+          )}
+        </View>
+
+        {noData && (
+          <View style={styles.noDataWrapper}>
+            <Ionicons name="alert-circle-outline" size={64} color="#FF5F15" />
+            <Text style={styles.noDataText}>No data found</Text>
+            <Text style={styles.noDataSubText}>
+              Please complete your profile information.
+            </Text>
           </View>
         )}
-      </View>
 
-      {noData && (
-        <View style={styles.noDataWrapper}>
-          <Ionicons name="alert-circle-outline" size={64} color="#FF5F15" />
-          <Text style={styles.noDataText}>No data found</Text>
-          <Text style={styles.noDataSubText}>
-            Please complete your profile information.
-          </Text>
-        </View>
-      )}
+        {userData && (
+          <>
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>PERSONAL INFORMATION</Text>
 
-      {userData && (
-        <>
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>PERSONAL INFORMATION</Text>
-
-            <View style={styles.row}>
-              <View style={styles.labelContainer}>
-                <Ionicons name="at-outline" size={20} color="#FF5F15" />
-                <Text style={styles.label}>Username</Text>
+              <View style={styles.row}>
+                <View style={styles.labelContainer}>
+                  <Ionicons name="at-outline" size={20} color="#FF5F15" />
+                  <Text style={styles.label}>Username</Text>
+                </View>
+                <View style={styles.valueRow}>
+                  <Text style={styles.valueText}>@{userData.fullName}</Text>
+                </View>
               </View>
-              <View style={styles.valueRow}>
-                <Text style={styles.valueText}>@{userData.fullName}</Text>
-              </View>
+
+              <TouchableOpacity style={styles.row}>
+                <View style={styles.labelContainer}>
+                  <Ionicons name="person-outline" size={20} color="#FF5F15" />
+                  <Text style={styles.label}>Name</Text>
+                </View>
+                <View style={styles.valueRow}>
+                  <Text style={styles.valueText}>{userData.fullName}</Text>
+                  <Ionicons name="chevron-forward" size={18} color="#FF5F15" />
+                </View>
+              </TouchableOpacity>
+
+              <TouchableOpacity style={styles.row}>
+                <View style={styles.labelContainer}>
+                  <Ionicons name="call-outline" size={20} color="#FF5F15" />
+                  <Text style={styles.label}>Phone</Text>
+                </View>
+                <View style={styles.valueRow}>
+                  <Text style={styles.valueText}>{userData.contact}</Text>
+                  <Ionicons name="chevron-forward" size={18} color="#FF5F15" />
+                </View>
+              </TouchableOpacity>
+
+              <TouchableOpacity style={styles.row}>
+                <View style={styles.labelContainer}>
+                  <Ionicons name="calendar-outline" size={20} color="#FF5F15" />
+                  <Text style={styles.label}>Birthday</Text>
+                </View>
+                <View style={styles.valueRow}>
+                  <Text style={styles.valueText}>{userData.birthday}</Text>
+                  <Ionicons name="chevron-forward" size={18} color="#FF5F15" />
+                </View>
+              </TouchableOpacity>
+
+              <TouchableOpacity style={styles.row}>
+                <View style={styles.labelContainer}>
+                  <Ionicons name="location-outline" size={20} color="#FF5F15" />
+                  <Text style={styles.label}>Country</Text>
+                </View>
+                <View style={styles.valueRow}>
+                  <Text style={styles.valueText}>{userData.country}</Text>
+                  <Ionicons name="chevron-forward" size={18} color="#FF5F15" />
+                </View>
+              </TouchableOpacity>
             </View>
 
-            <TouchableOpacity style={styles.row}>
-              <View style={styles.labelContainer}>
-                <Ionicons name="person-outline" size={20} color="#FF5F15" />
-                <Text style={styles.label}>Name</Text>
-              </View>
-              <View style={styles.valueRow}>
-                <Text style={styles.valueText}>{userData.fullName}</Text>
-                <Ionicons name="chevron-forward" size={18} color="#FF5F15" />
-              </View>
-            </TouchableOpacity>
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>LOGIN INFORMATION</Text>
+              <TouchableOpacity style={styles.row}>
+                <View style={styles.labelContainer}>
+                  <Ionicons name="mail-outline" size={20} color="#FF5F15" />
+                  <Text style={styles.label}>Email</Text>
+                </View>
+                <View style={styles.valueRow}>
+                  <Text style={styles.valueText}>{userData.email}</Text>
+                  <Ionicons name="chevron-forward" size={18} color="#FF5F15" />
+                </View>
+              </TouchableOpacity>
+            </View>
 
-            <TouchableOpacity style={styles.row}>
-              <View style={styles.labelContainer}>
-                <Ionicons name="call-outline" size={20} color="#FF5F15" />
-                <Text style={styles.label}>Phone</Text>
-              </View>
-              <View style={styles.valueRow}>
-                <Text style={styles.valueText}>{userData.contact}</Text>
-                <Ionicons name="chevron-forward" size={18} color="#FF5F15" />
-              </View>
+            <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+              <Ionicons
+                name="log-out-outline"
+                size={22}
+                color="#fff"
+                style={{ marginRight: 8 }}
+              />
+              <Text style={styles.logoutText}>Logout</Text>
             </TouchableOpacity>
-
-            <TouchableOpacity style={styles.row}>
-              <View style={styles.labelContainer}>
-                <Ionicons name="calendar-outline" size={20} color="#FF5F15" />
-                <Text style={styles.label}>Birthday</Text>
-              </View>
-              <View style={styles.valueRow}>
-                <Text style={styles.valueText}>{userData.birthday}</Text>
-                <Ionicons name="chevron-forward" size={18} color="#FF5F15" />
-              </View>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.row}>
-              <View style={styles.labelContainer}>
-                <Ionicons name="location-outline" size={20} color="#FF5F15" />
-                <Text style={styles.label}>Country</Text>
-              </View>
-              <View style={styles.valueRow}>
-                <Text style={styles.valueText}>{userData.country}</Text>
-                <Ionicons name="chevron-forward" size={18} color="#FF5F15" />
-              </View>
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>LOGIN INFORMATION</Text>
-            <TouchableOpacity style={styles.row}>
-              <View style={styles.labelContainer}>
-                <Ionicons name="mail-outline" size={20} color="#FF5F15" />
-                <Text style={styles.label}>Email</Text>
-              </View>
-              <View style={styles.valueRow}>
-                <Text style={styles.valueText}>{userData.email}</Text>
-                <Ionicons name="chevron-forward" size={18} color="#FF5F15" />
-              </View>
-            </TouchableOpacity>
-          </View>
-        </>
-      )}
-    </ScrollView>
+          </>
+        )}
+      </ScrollView>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f5f5f5",
   },
   avatarWrapper: {
     alignItems: "center",
@@ -241,5 +267,21 @@ const styles = StyleSheet.create({
     color: "#999",
     marginTop: 6,
     textAlign: "center",
+  },
+  logoutButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 30,
+    backgroundColor: "#FF5F15",
+    paddingVertical: 14,
+    paddingHorizontal: 40,
+    borderRadius: 30,
+    elevation: 4,
+  },
+  logoutText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });

@@ -70,8 +70,6 @@ function RootLayoutContent() {
         <Redirect href="/(auth)/login" /> // Fallback if role is not set or invalid
       )}
 
- 
-
       <Stack.Screen
         name="personalinfo"
         options={{ headerShown: true, title: "Personal Info" }}
