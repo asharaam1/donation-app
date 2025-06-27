@@ -12,57 +12,46 @@ const handleLogout = () => {
       router.push("/");
     })
     .catch((error) => {
+      console.log("Logout error:", error.message);
     });
 };
 
 const _layout = () => {
   return (
     <Tabs
-      screenOptions={{
+      screenOptions={({ route }) => ({
         tabBarStyle: {
           backgroundColor: "#000000",
           borderRadius: 25,
           marginBottom: 20,
           marginHorizontal: 20,
+          height: 70,
+          paddingBottom: 10,
         },
-        tabBarActiveTintColor: "#FF5F15",
-        tabBarInactiveTintColor: "#666",
-      }}
+        tabBarActiveTintColor: "#FF5F15", // Orange when active
+        tabBarInactiveTintColor: "#FFFFFF", // White when inactive
+        tabBarLabelStyle: {
+          fontSize: 12,
+          fontWeight: "600",
+        },
+      })}
     >
-      {/* <Tabs.Screen
-        name="index"
-        options={{
-          tabBarItem: { showIcon: false, showLabel: false },
-          headerShown: false,
-        }}
-      /> */}
-      {/* <Tabs.Screen
-        name="signup"
-        options={{
-          headerShown: false,
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="person-add-outline" size={size} color={color} />
-          ),
-          tabBarLabel: "Sign Up",
-        }}
-      /> */}
       <Tabs.Screen
         name="index"
         options={{
           headerShown: true,
-          header: () => <CustomHeader head="Donor" />,
+          header: () => <CustomHeader head="Donor"  />,
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="home-outline" size={size} color={color} />
-
           ),
           tabBarLabel: "Donor",
         }}
       />
+
       <Tabs.Screen
         name="give"
         options={{
           headerShown: false,
-          header: () => <CustomHeader head="Donor" userRole="/donor" profile="/profile"/>,
           tabBarIcon: ({ color }) => (
             <View style={{ marginBottom: 10 }}>
               <Ionicons name="add-circle-outline" size={40} color={color} />
@@ -71,6 +60,7 @@ const _layout = () => {
           tabBarLabel: "Give",
         }}
       />
+
       <Tabs.Screen
         name="Profile"
         options={{
@@ -89,27 +79,6 @@ const _layout = () => {
               onPress={handleLogout}
             />
           ),
-        }}
-      />
-      <Tabs.Screen
-        name="personalinfo"
-        options={{
-          tabBarItem: { showIcon: false, showLabel: false },
-          headerShown: false,
-        }}
-      />
-      <Tabs.Screen
-        name="address"
-        options={{
-          tabBarItem: { showIcon: false, showLabel: false },
-          headerShown: false,
-        }}
-      />
-      <Tabs.Screen
-        name="DonorHistory"
-        options={{
-          tabBarItem: { showIcon: false, showLabel: false },
-          headerShown: false,
         }}
       />
     </Tabs>

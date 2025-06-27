@@ -243,10 +243,10 @@ const DetailPage = () => {
 
             <View style={styles.amountContainer}>
               <Text style={styles.raised}>
-                ₹{amountRaised.toLocaleString("en-IN")} raised
+                Rs.{amountRaised.toLocaleString("en-IN")} raised
               </Text>
               <Text style={styles.goal}>
-                of ₹{amountRequested.toLocaleString("en-IN")} goal
+                of Rs.{amountRequested.toLocaleString("en-IN")} goal
               </Text>
             </View>
 

@@ -1,8 +1,26 @@
 import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
-import { collection, doc, getDoc, getDocs, query, setDoc, where } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  query,
+  setDoc,
+  where,
+} from "firebase/firestore";
 import React, { useEffect, useState } from "react";
-import { ActivityIndicator, Alert, Image, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import {
+  ActivityIndicator,
+  Alert,
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { auth, db } from "../Firebase/config";
 
 const RaiseFundScreen = () => {
@@ -94,7 +112,10 @@ const RaiseFundScreen = () => {
 
     const mobileRegex = /^03\d{9}$/;
     if (!mobileRegex.test(mobile)) {
-      Alert.alert("Error", "Please enter a valid mobile number starting with 03");
+      Alert.alert(
+        "Error",
+        "Please enter a valid mobile number starting with 03"
+      );
       console.log("File check - fundraise.js loaded properly");
       return;
     }
@@ -102,11 +123,14 @@ const RaiseFundScreen = () => {
     setKycLoading(true);
     try {
       const user = auth.currentUser;
-      const kycQuery = query(collection(db, "kycRequests"), where("userId", "==", user.uid));
+      const kycQuery = query(
+        collection(db, "kycRequests"),
+        where("userId", "==", user.uid)
+      );
       const kycSnapshot = await getDocs(kycQuery);
       if (!kycSnapshot.empty) {
         Alert.alert("KYC Exists", "You have already submitted KYC.");
-        router.push('/needy/fundraise')
+        router.push("/needy/fundraise");
         setKycLoading(false);
         return;
       }
@@ -125,7 +149,7 @@ const RaiseFundScreen = () => {
         status: "pending",
         submittedAt: Date.now(),
         reviewedby: null,
-      }
+      };
       await setDoc(doc(db, "kycRequests", user.uid), obj);
 
       Alert.alert("Success", "KYC submitted successfully.");
@@ -133,7 +157,7 @@ const RaiseFundScreen = () => {
       setCnicBack(null);
       setAddress("");
       setMobile("");
-      router.push('/needy')
+      router.push("/needy");
     } catch (err) {
       console.error(err);
       Alert.alert("Error", "Failed to submit KYC");
@@ -153,25 +177,52 @@ const RaiseFundScreen = () => {
           <TouchableOpacity onPress={() => pickImage(setCnicFront)}>
             <View style={styles.imagePicker}>
               {cnicFront ? (
-                <Image source={{ uri: cnicFront.uri }} style={styles.previewImage} />
+                <Image
+                  source={{ uri: cnicFront.uri }}
+                  style={styles.previewImage}
+                />
               ) : (
-                <Text style={{ color: "#666", textAlign: 'center' }}>Pick Cnic Front Image</Text>
+                <Text style={{ color: "#666", textAlign: "center" }}>
+                  Pick Cnic Front Image
+                </Text>
               )}
             </View>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => pickImage(setCnicBack)}>
             <View style={styles.imagePicker}>
               {cnicBack ? (
-                <Image source={{ uri: cnicBack.uri }} style={styles.previewImage} />
+                <Image
+                  source={{ uri: cnicBack.uri }}
+                  style={styles.previewImage}
+                />
               ) : (
-                <Text style={{ color: "#666", textAlign: 'center' }}>Pick Cnic Back Image</Text>
+                <Text style={{ color: "#666", textAlign: "center" }}>
+                  Pick Cnic Back Image
+                </Text>
               )}
             </View>
           </TouchableOpacity>
-          <TextInput style={styles.inputBox} placeholder="Full Address" value={address} onChangeText={setAddress} />
-          <TextInput style={styles.inputBox} placeholder="Mobile Number (03XXXXXXXXX)" value={mobile} onChangeText={setMobile} keyboardType="phone-pad" />
-          <TouchableOpacity style={styles.button} onPress={submitKyc} disabled={kycLoading}>
-            <Text style={styles.buttonText}>{kycLoading ? "Submitting..." : "Submit KYC"}</Text>
+          <TextInput
+            style={styles.inputBox}
+            placeholder="Full Address"
+            value={address}
+            onChangeText={setAddress}
+          />
+          <TextInput
+            style={styles.inputBox}
+            placeholder="Mobile Number (03XXXXXXXXX)"
+            value={mobile}
+            onChangeText={setMobile}
+            keyboardType="phone-pad"
+          />
+          <TouchableOpacity
+            style={styles.button}
+            onPress={submitKyc}
+            disabled={kycLoading}
+          >
+            <Text style={styles.buttonText}>
+              {kycLoading ? "Submitting..." : "Submit KYC"}
+            </Text>
           </TouchableOpacity>
         </>
       ) : (
@@ -187,55 +238,55 @@ const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     padding: 20,
-    backgroundColor: '#fff',
-    justifyContent: 'center'
+    backgroundColor: "#fff",
+    justifyContent: "center",
   },
   title: {
     fontSize: 28,
-    fontWeight: 'bold',
-    textAlign: 'center',
+    fontWeight: "bold",
+    textAlign: "center",
     marginVertical: 20,
-    color: '#ff5528'
+    color: "#ff5528",
   },
   errorText: {
-    color: 'red',
+    color: "red",
     fontSize: 18,
-    textAlign: 'center',
+    textAlign: "center",
     marginTop: 50,
   },
   inputBox: {
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: "#ccc",
     padding: 12,
     marginBottom: 12,
     borderRadius: 10,
   },
   button: {
-    backgroundColor: '#ff5528',
+    backgroundColor: "#ff5528",
     padding: 15,
     borderRadius: 10,
-    alignItems: 'center',
+    alignItems: "center",
     marginVertical: 10,
   },
   buttonText: {
-    color: '#fff',
-    fontWeight: 'bold',
+    color: "#fff",
+    fontWeight: "bold",
   },
   imagePicker: {
     height: 150,
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: "#ccc",
     borderRadius: 10,
     marginBottom: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
-    overflow: 'hidden',
-    backgroundColor: '#fafafa',
+    justifyContent: "center",
+    alignItems: "center",
+    overflow: "hidden",
+    backgroundColor: "#fafafa",
   },
   previewImage: {
-    width: '100%',
-    height: '100%',
-    resizeMode: 'cover',
+    width: "100%",
+    height: "100%",
+    resizeMode: "cover",
   },
 });
 
