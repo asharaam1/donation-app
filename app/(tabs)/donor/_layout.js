@@ -21,15 +21,15 @@ const _layout = () => {
     <Tabs
       screenOptions={({ route }) => ({
         tabBarStyle: {
-          backgroundColor: "#000000",
+          backgroundColor: "white",
           borderRadius: 25,
           marginBottom: 20,
           marginHorizontal: 20,
           height: 70,
           paddingBottom: 10,
         },
-        tabBarActiveTintColor: "#FF5F15", // Orange when active
-        tabBarInactiveTintColor: "#FFFFFF", // White when inactive
+        tabBarActiveTintColor: "#FF5F15", 
+        tabBarInactiveTintColor: "#666", 
         tabBarLabelStyle: {
           fontSize: 12,
           fontWeight: "600",

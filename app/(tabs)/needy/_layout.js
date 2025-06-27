@@ -1,45 +1,60 @@
-// import { Stack } from 'expo-router';
-
-// export default function NeedyLayout() {
-//   return <Stack />;
-// }
 import { Ionicons } from '@expo/vector-icons';
-import { Tabs } from 'expo-router';
+import { router, Tabs } from 'expo-router';
+import { signOut } from 'firebase/auth';
+import React from 'react';
+import { View } from 'react-native';
+import { auth } from '../../../Firebase/config';
 import CustomHeader from '../../../components/CustomHeader';
-import { View } from 'react-native-web';
 
-export default function DonorLayout() {
+const handleLogout = () => {
+  signOut(auth)
+    .then(() => {
+      router.push("/");
+    })
+    .catch((error) => {
+      console.log("Logout error:", error.message);
+    });
+};
+
+export default function NeedyLayout() {
   return (
     <Tabs
-      screenOptions={{
+      screenOptions={({ route }) => ({
         tabBarStyle: {
-          backgroundColor: "#000000",
+          backgroundColor: "white",
           borderRadius: 25,
           marginBottom: 20,
           marginHorizontal: 20,
+          height: 70,
+          paddingBottom: 10,
         },
         tabBarActiveTintColor: "#FF5F15",
         tabBarInactiveTintColor: "#666",
-      }}
+        tabBarLabelStyle: {
+          fontSize: 12,
+          fontWeight: "600",
+        },
+      })}
     >
       <Tabs.Screen
         name="index"
         options={{
           headerShown: true,
           header: () => <CustomHeader head="Needy" userRole="/needy" profile="/profile" />,
-          tabBarIcon: ({ size }) => (
-            <Ionicons name="home-outline" size={size} color="#FF5F15" />
+          tabBarIcon: ({ size, color }) => (
+            <Ionicons name="home-outline" size={size} color={color} />
           ),
           tabBarLabel: "Home",
         }}
       />
+
       <Tabs.Screen
         name="fundraise"
         options={{
           headerShown: true,
-          tabBarIcon: ({ size }) => (
+          tabBarIcon: ({ size, color }) => (
             <View style={{ marginBottom: 10 }}>
-              <Ionicons name="add-circle-outline" size={size} color="#FF5F15" />
+              <Ionicons name="add-circle-outline" size={size} color={color} />
             </View>
           ),
           tabBarLabel: "Raise Fund",
@@ -48,14 +63,17 @@ export default function DonorLayout() {
       <Tabs.Screen
         name="dashboard"
         options={{
-          title: 'dashboard',
-          tabBarLabel: 'dashboard'
+          headerShown: true,
+          title: "dashboard",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="stats-chart-outline" size={size} color={color} />
+          ),
+          tabBarLabel: "Dashboard",
         }}
       />
 
 
-
-      <Tabs.Screen
+      {/* <Tabs.Screen
         name="kycVerify"
         options={{
           tabBarItem: { showIcon: false, showLabel: false },
@@ -68,7 +86,7 @@ export default function DonorLayout() {
           tabBarItem: { showIcon: false, showLabel: false },
           headerShown: false,
         }}
-      />
+      /> */}
     </Tabs>
 
   )
