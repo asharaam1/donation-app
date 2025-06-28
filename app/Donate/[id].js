@@ -18,6 +18,7 @@ import { Stack, useLocalSearchParams } from "expo-router";
 import { Feather } from "@expo/vector-icons";
 import { onAuthStateChanged } from "firebase/auth";
 import { updateDoc } from "firebase/firestore";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const DetailPage = () => {
   const { id } = useLocalSearchParams();
@@ -180,43 +181,44 @@ const DetailPage = () => {
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
-      style={{ flex: 1 }}
-    >
-      <Stack.Screen options={{ title: "Fund Details", headerShown: true }} />
-      <ScrollView
-        style={styles.container}
-        contentContainerStyle={{ paddingBottom: 40 }}
+    <SafeAreaView>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        style={{ flex: 1 }}
       >
-        <Animated.View
-          style={{ opacity: fadeAnim, transform: [{ scale: scaleAnim }] }}
+        <Stack.Screen options={{ title: "Fund Details", headerShown: true }} />
+        <ScrollView
+          style={styles.container}
+          contentContainerStyle={{ paddingBottom: 40 }}
         >
-          {blogImg ? (
-            <Animated.Image source={{ uri: blogImg }} style={styles.image} />
-          ) : (
-            <View style={styles.imagePlaceholder}>
-              <Feather name="image" size={40} color="#ccc" />
-            </View>
-          )}
-
-          <View style={styles.content}>
-            <Text style={styles.title}>{title}</Text>
-            <View style={styles.divider} />
-            <Text style={styles.description}>{description}</Text>
-
-            <View style={styles.metaContainer}>
-              <View style={styles.metaItem}>
-                <Feather name="calendar" size={18} color="#ff4500" />
-                <Text style={styles.metaText}> {readableDate}</Text>
+          <Animated.View
+            style={{ opacity: fadeAnim, transform: [{ scale: scaleAnim }] }}
+          >
+            {blogImg ? (
+              <Animated.Image source={{ uri: blogImg }} style={styles.image} />
+            ) : (
+              <View style={styles.imagePlaceholder}>
+                <Feather name="image" size={40} color="#ccc" />
               </View>
+            )}
 
-              <View style={styles.metaItem}>
-                <Feather name="user" size={18} color="#ff4500" />
-                <Text style={styles.metaText}> {needyName}</Text>
-              </View>
+            <View style={styles.content}>
+              <Text style={styles.title}>{title}</Text>
+              <View style={styles.divider} />
+              <Text style={styles.description}>{description}</Text>
 
-              {/* <View
+              <View style={styles.metaContainer}>
+                <View style={styles.metaItem}>
+                  <Feather name="calendar" size={18} color="#ff4500" />
+                  <Text style={styles.metaText}> {readableDate}</Text>
+                </View>
+
+                <View style={styles.metaItem}>
+                  <Feather name="user" size={18} color="#ff4500" />
+                  <Text style={styles.metaText}> {needyName}</Text>
+                </View>
+
+                {/* <View
                 style={[
                   styles.statusBadge,
                   {
@@ -239,62 +241,63 @@ const DetailPage = () => {
                   {status.charAt(0).toUpperCase() + status.slice(1)}
                 </Text>
               </View> */}
+              </View>
+
+              <View style={styles.amountContainer}>
+                <Text style={styles.raised}>
+                  Rs.{amountRaised.toLocaleString("en-IN")} raised
+                </Text>
+                <Text style={styles.goal}>
+                  of Rs.{amountRequested.toLocaleString("en-IN")} goal
+                </Text>
+              </View>
+
+              <View style={styles.progressBar}>
+                <Animated.View
+                  style={[
+                    styles.progressFill,
+                    {
+                      width: `${percentage}%`,
+                      backgroundColor:
+                        percentage >= 100 ? statusColors.completed : "#ff4500",
+                    },
+                  ]}
+                />
+              </View>
+              <Text style={styles.percentage}>{percentage}% Funded</Text>
+
+              <View style={styles.formContainer}>
+                <Text style={styles.formTitle}>Make a Donation</Text>
+                <Text style={styles.formSubtitle}>
+                  Your contribution can make a significant difference.
+                </Text>
+
+                <TextInput
+                  style={styles.input}
+                  placeholder="Donation Amount (Rs)"
+                  keyboardType="numeric"
+                  value={donationAmount}
+                  onChangeText={setDonationAmount}
+                />
+
+                <TextInput
+                  style={[styles.input, styles.textArea]}
+                  placeholder="Your Message (Optional)"
+                  multiline
+                  numberOfLines={4}
+                  value={donationMessage}
+                  onChangeText={setDonationMessage}
+                />
+
+                <TouchableOpacity style={styles.button} onPress={SendDonation}>
+                  <Text style={styles.buttonText}>SEND DONATION →</Text>
+                </TouchableOpacity>
+              </View>
             </View>
-
-            <View style={styles.amountContainer}>
-              <Text style={styles.raised}>
-                Rs.{amountRaised.toLocaleString("en-IN")} raised
-              </Text>
-              <Text style={styles.goal}>
-                of Rs.{amountRequested.toLocaleString("en-IN")} goal
-              </Text>
-            </View>
-
-            <View style={styles.progressBar}>
-              <Animated.View
-                style={[
-                  styles.progressFill,
-                  {
-                    width: `${percentage}%`,
-                    backgroundColor:
-                      percentage >= 100 ? statusColors.completed : "#ff4500",
-                  },
-                ]}
-              />
-            </View>
-            <Text style={styles.percentage}>{percentage}% Funded</Text>
-
-            <View style={styles.formContainer}>
-              <Text style={styles.formTitle}>Make a Donation</Text>
-              <Text style={styles.formSubtitle}>
-                Your contribution can make a significant difference.
-              </Text>
-
-              <TextInput
-                style={styles.input}
-                placeholder="Donation Amount (Rs)"
-                keyboardType="numeric"
-                value={donationAmount}
-                onChangeText={setDonationAmount}
-              />
-
-              <TextInput
-                style={[styles.input, styles.textArea]}
-                placeholder="Your Message (Optional)"
-                multiline
-                numberOfLines={4}
-                value={donationMessage}
-                onChangeText={setDonationMessage}
-              />
-
-              <TouchableOpacity style={styles.button} onPress={SendDonation}>
-                <Text style={styles.buttonText}>SEND DONATION →</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </Animated.View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+          </Animated.View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 };
 

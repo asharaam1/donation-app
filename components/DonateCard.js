@@ -51,13 +51,13 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     borderRadius: 10,
     padding: 10,
-    // margin: 10,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 5,
     elevation: 3,
-    height: "100%",
+    maxHeight: 400, // Limit height
+    overflow: "hidden",
   },
   image: {
     width: "100%",
@@ -87,7 +87,6 @@ const styles = StyleSheet.create({
   byText: {
     fontSize: 12,
     color: "#666",
-    // textAlign: "right",
     marginTop: 5,
     fontStyle: "italic",
     fontWeight: "bold",
