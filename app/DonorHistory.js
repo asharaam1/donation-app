@@ -85,87 +85,91 @@ const DonationsPage = () => {
   return (
     <ImageBackground
       source={ornageimg}
+      style={{ flex: 1 }}
       imageStyle={{ opacity: 0.08 }}
     >
       <LinearGradient
         colors={["#ffffff", "#fff4e6", "#ffedd5"]}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
-        style={StyleSheet.absoluteFill}
-      />
-      <ScrollView style={styles.container}>
+        style={{ flex: 1 }}
+      >
         <Stack.Screen options={{ title: "My Donations", headerShown: true }} />
 
-        <View style={styles.header}>
-          <LinearGradient
-            colors={["#ffd6a5", "#ffb085", "#ff9248"]}
-            style={styles.totalContainer}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-          >
-            <View style={styles.totalInnerPattern}>
-              <Text style={styles.title}>Total Donated</Text>
-              <Text style={styles.amount}>₹{total.toLocaleString("en-IN")}</Text>
-            </View>
-          </LinearGradient>
-        </View>
-
-        <View style={styles.sectionHeader}>
-          <Text style={styles.subTitle}>Donation History</Text>
-          <View style={styles.orangeLine} />
-        </View>
-
-        {donations.length === 0 ? (
-          <View style={styles.emptyContainer}>
-            <LinearGradient
-              colors={["#ffffff", "#fff4e6"]}
-              style={styles.emptyCard}
-            >
-              <Text style={styles.emptyText}>No donations made yet.</Text>
-            </LinearGradient>
-          </View>
-        ) : (
-          <FlatList
-            data={donations}
-            keyExtractor={(item) => item.id}
-            scrollEnabled={false}
-            contentContainerStyle={{ paddingBottom: 40 }}
-            renderItem={({ item }) => (
-              <View style={styles.cardContainer}>
+        <FlatList
+          ListHeaderComponent={
+            <>
+              <View style={styles.header}>
                 <LinearGradient
-                  colors={["#ffffff", "#fff7f2"]}
-                  style={styles.card}
+                  colors={["#ffd6a5", "#ffb085", "#ff9248"]}
+                  style={styles.totalContainer}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 1 }}
                 >
-                  <View style={styles.cardHeader}>
-                    <Text style={styles.cardTitle}>To: {item.needyName}</Text>
-                    <View style={styles.amountPill}>
-                      <Text style={styles.cardAmount}>
-                        ₹{item.amount.toLocaleString("en-IN")}
-                      </Text>
-                    </View>
-                  </View>
-                  {item.message ? (
-                    <Text style={styles.cardMessage}>"{item.message}"</Text>
-                  ) : null}
-                  <View style={styles.cardFooter}>
-                    <Text style={styles.cardDate}>
-                      {new Date(item.createdAt).toLocaleDateString("en-GB")} at{" "}
-                      {new Date(item.createdAt).toLocaleTimeString([], {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
+                  <View style={styles.totalInnerPattern}>
+                    <Text style={styles.title}>Total Donated</Text>
+                    <Text style={styles.amount}>
+                      ₹{total.toLocaleString("en-IN")}
                     </Text>
-                    <View style={styles.orangeDot} />
                   </View>
                 </LinearGradient>
-                <View style={styles.cardShadow} />
               </View>
-            )}
-          />
-        )}
-      </ScrollView>
+
+              <View style={styles.sectionHeader}>
+                <Text style={styles.subTitle}>Donation History</Text>
+                <View style={styles.orangeLine} />
+              </View>
+
+              {donations.length === 0 && (
+                <View style={styles.emptyContainer}>
+                  <LinearGradient
+                    colors={["#ffffff", "#fff4e6"]}
+                    style={styles.emptyCard}
+                  >
+                    <Text style={styles.emptyText}>No donations made yet.</Text>
+                  </LinearGradient>
+                </View>
+              )}
+            </>
+          }
+          data={donations}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={{ paddingBottom: 40, paddingHorizontal: 16 }}
+          renderItem={({ item }) => (
+            <View style={styles.cardContainer}>
+              <LinearGradient
+                colors={["#ffffff", "#fff7f2"]}
+                style={styles.card}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+              >
+                <View style={styles.cardHeader}>
+                  <Text style={styles.cardTitle}>To: {item.needyName}</Text>
+                  <View style={styles.amountPill}>
+                    <Text style={styles.cardAmount}>
+                      ₹{item.amount.toLocaleString("en-IN")}
+                    </Text>
+                  </View>
+                </View>
+                {item.message ? (
+                  <Text style={styles.cardMessage}>"{item.message}"</Text>
+                ) : null}
+                <View style={styles.cardFooter}>
+                  <Text style={styles.cardDate}>
+                    {new Date(item.createdAt).toLocaleDateString("en-GB")} at{" "}
+                    {new Date(item.createdAt).toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </Text>
+                  <View style={styles.orangeDot} />
+                </View>
+              </LinearGradient>
+              <View style={styles.cardShadow} />
+            </View>
+          )}
+        />
+      </LinearGradient>
     </ImageBackground>
   );
 };
