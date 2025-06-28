@@ -2,7 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { router, Tabs } from "expo-router";
 import { signOut } from "firebase/auth";
 import React from "react";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet } from "react-native";
 import { auth } from "../../../Firebase/config";
 import CustomHeader from "../../../components/CustomHeader";
 
@@ -28,8 +28,8 @@ const _layout = () => {
           height: 70,
           paddingBottom: 10,
         },
-        tabBarActiveTintColor: "#FF5F15", 
-        tabBarInactiveTintColor: "#666", 
+        tabBarActiveTintColor: "#FF5F15",
+        tabBarInactiveTintColor: "#666",
         tabBarLabelStyle: {
           fontSize: 12,
           fontWeight: "600",
@@ -40,7 +40,7 @@ const _layout = () => {
         name="index"
         options={{
           headerShown: true,
-          header: () => <CustomHeader head="Donor"  />,
+          header: () => <CustomHeader head="Donor" />,
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="home-outline" size={size} color={color} />
           ),
@@ -52,10 +52,8 @@ const _layout = () => {
         name="give"
         options={{
           headerShown: false,
-          tabBarIcon: ({ color }) => (
-            <View style={{ marginBottom: 10 }}>
-              <Ionicons name="add-circle-outline" size={40} color={color} />
-            </View>
+          tabBarIcon: ({ size, color }) => (
+            <Ionicons name="add-circle-outline" size={size} color={color} />
           ),
           tabBarLabel: "Give",
         }}

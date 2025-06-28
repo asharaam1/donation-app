@@ -1,10 +1,12 @@
 // app/_layout.js
-import { Redirect, Stack } from "expo-router";
+import { Redirect, router, Stack } from "expo-router";
 import { doc, getDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, View } from "react-native";
 import { AuthProvider, useAuth } from "../context/AuthContext";
-import { db } from "../Firebase/config";
+import { auth, db } from "../Firebase/config";
+import { signOut } from "firebase/auth";
+import { Ionicons } from "@expo/vector-icons";
 
 if (typeof setImmediate === "undefined") {
   global.setImmediate = setTimeout;
@@ -58,6 +60,16 @@ function RootLayoutContent() {
     );
   }
 
+  const handleLogout = () => {
+    signOut(auth)
+      .then(() => {
+        router.push("/");
+      })
+      .catch((error) => {
+        console.log("Logout error:", error.message);
+      });
+  };
+
   return (
     <Stack screenOptions={{ headerShown: false }}>
       {!user ? (
@@ -83,12 +95,24 @@ function RootLayoutContent() {
         options={{ headerShown: true, title: "My Donations" }}
       />
       <Stack.Screen
+        name="needyHistory"
+        options={{ headerShown: true, title: "My Fund Raises" }}
+      />
+      <Stack.Screen
         name="kycVerify"
         options={{ headerShown: true, title: "Verify KYC" }}
       />
       <Stack.Screen
         name="profile"
-        options={{ headerShown: true, title: "My Profile" }}
+        options={{ headerShown: true, title: "My Profile" , headerRight: () => (
+          <Ionicons
+            name="log-out-outline"
+            size={24}
+            color="#FF5F15"
+            style={{ marginRight: 15 }}
+            onPress={handleLogout}
+          />
+        ),}}
       />
     </Stack>
   );

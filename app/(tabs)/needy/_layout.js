@@ -6,15 +6,6 @@ import { View } from 'react-native';
 import { auth } from '../../../Firebase/config';
 import CustomHeader from '../../../components/CustomHeader';
 
-const handleLogout = () => {
-  signOut(auth)
-    .then(() => {
-      router.push("/");
-    })
-    .catch((error) => {
-      console.log("Logout error:", error.message);
-    });
-};
 
 export default function NeedyLayout() {
   return (
@@ -53,9 +44,7 @@ export default function NeedyLayout() {
         options={{
           headerShown: true,
           tabBarIcon: ({ size, color }) => (
-            <View style={{ marginBottom: 10 }}>
-              <Ionicons name="add-circle-outline" size={size} color={color} />
-            </View>
+            <Ionicons name="add-circle-outline" size={size} color={color} />
           ),
           tabBarLabel: "Raise Fund",
         }}
@@ -71,23 +60,6 @@ export default function NeedyLayout() {
           tabBarLabel: "Dashboard",
         }}
       />
-
-
-      {/* <Tabs.Screen
-        name="kycVerify"
-        options={{
-          tabBarItem: { showIcon: false, showLabel: false },
-          headerShown: false,
-        }}
-      />
-      <Tabs.Screen
-        name="profile"
-        options={{
-          tabBarItem: { showIcon: false, showLabel: false },
-          headerShown: false,
-        }}
-      /> */}
     </Tabs>
-
   )
 }

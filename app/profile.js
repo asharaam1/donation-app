@@ -95,14 +95,17 @@ function Profile() {
             />
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.menuItem}>
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={() => router.push("/needyHistory")}
+          >
             <MaterialIcons
               name="card-giftcard"
               size={24}
               color="#FF5F15"
               style={styles.menuIcon}
             />
-            <Text style={styles.menuText}>Donation</Text>
+            <Text style={styles.menuText}>My Fund Raises</Text>
             <Entypo
               name="chevron-right"
               size={24}

@@ -37,8 +37,8 @@ export default function NeedyHome() {
             <Text style={styles.cardTitle}>{title}</Text>
             <Text style={styles.cardDescription}>{desc}</Text>
             <View style={styles.progressContainer}>
-              <Text style={styles.progressText}>Raised {raised}₹</Text>
-              <Text style={styles.progressText}>Goal {goal}₹</Text>
+              <Text style={styles.progressText}>Raised Rs.{raised}</Text>
+              <Text style={styles.progressText}>Goal Rs.{goal}</Text>
             </View>
             <View style={styles.progressBar}>
               <View style={[styles.progressFill, { width: `${(raised/goal)*100}%` }]} />
