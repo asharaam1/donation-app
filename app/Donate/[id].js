@@ -11,71 +11,72 @@ import {
   TouchableOpacity,
   KeyboardAvoidingView,
   Platform,
+  Image,
 } from "react-native";
-import { doc, getDoc, addDoc, collection } from "firebase/firestore";
+import { doc, getDoc, addDoc, collection, updateDoc } from "firebase/firestore";
 import { db, auth } from "../../Firebase/config";
-import { Stack, useLocalSearchParams } from "expo-router";
-import { Feather } from "@expo/vector-icons";
+import { useLocalSearchParams, router } from "expo-router";
 import { onAuthStateChanged } from "firebase/auth";
-import { updateDoc } from "firebase/firestore";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { Ionicons } from "@expo/vector-icons";
 
 const DetailPage = () => {
   const { id } = useLocalSearchParams();
+  const requestId = Array.isArray(id) ? id[0] : id;
+
   const [requestData, setRequestData] = useState(null);
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(0.95)).current;
 
   const [donationAmount, setDonationAmount] = useState("");
   const [donationMessage, setDonationMessage] = useState("");
-  const [donorId, setdonorId] = useState();
-  const [userData, setUserData] = useState({});
-  const [donorName, setDonorName] = useState("");
+  const [donorId, setDonorId] = useState();
+  const [donorName, setDonorName] = useState("Anonymous");
   const [needyName, setNeedyName] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const fetchUserData = async () => {
-      onAuthStateChanged(auth, async (user) => {
-        if (user) {
-          const uid = user.uid;
-          setdonorId(uid);
-
+    const unsubscribeAuth = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        const uid = user.uid;
+        setDonorId(uid);
+        try {
           const userRef = doc(db, "users", uid);
           const userSnap = await getDoc(userRef);
-
           if (userSnap.exists()) {
             const data = userSnap.data();
-            setUserData(data);
             setDonorName(data.fullName || "Anonymous");
           }
+        } catch (err) {
+          console.error("Error fetching user data:", err);
         }
-      });
-    };
+      }
+    });
 
-    fetchUserData();
+    return unsubscribeAuth;
   }, []);
 
   useEffect(() => {
-    if (!id) return;
+    if (!requestId) return;
+
     const fetchData = async () => {
+      setIsLoading(true);
       try {
-        const snap = await getDoc(doc(db, "fundRequests", id));
+        const snap = await getDoc(doc(db, "fundRequests", requestId));
 
         if (snap.exists()) {
           const data = snap.data();
           setRequestData(data);
 
-          // Fetch needy user's name
           if (data.userId) {
             try {
               const needyRef = doc(db, "users", data.userId);
               const needySnap = await getDoc(needyRef);
-              if (needySnap.exists()) {
-                const needyData = needySnap.data();
-                setNeedyName(needyData.fullName || "Unknown User");
-              } else {
-                setNeedyName("Unknown User");
-              }
+              setNeedyName(
+                needySnap.exists()
+                  ? needySnap.data().fullName || "Unknown User"
+                  : "Unknown User"
+              );
             } catch (err) {
               console.error("Error fetching needy data:", err);
               setNeedyName("Unknown User");
@@ -96,34 +97,39 @@ const DetailPage = () => {
               useNativeDriver: true,
             }),
           ]).start();
+        } else {
+          console.warn("No document found for ID:", requestId);
         }
       } catch (err) {
         console.error("Error fetching fund data:", err);
+      } finally {
+        setIsLoading(false);
       }
     };
-    fetchData();
-  }, [id]);
 
-  const SendDonation = async () => {
-    if (!donationAmount) {
-      alert("Please enter a donation amount.");
+    fetchData();
+  }, [requestId]);
+
+  const handleDonation = async () => {
+    if (!donationAmount || isNaN(parseFloat(donationAmount))) {
+      alert("Please enter a valid donation amount.");
       return;
     }
 
     const donationAmt = parseFloat(donationAmount);
 
     try {
-      const docRef = await addDoc(collection(db, "donations"), {
-        donorId: donorId,
-        donorName: donorName,
-        needyid: id,
-        needyName: needyName,
+      await addDoc(collection(db, "donations"), {
+        donorId,
+        donorName,
+        needyid: requestId,
+        needyName,
         amount: donationAmt,
         message: donationMessage,
         createdAt: Date.now(),
       });
 
-      const requestRef = doc(db, "fundRequests", id);
+      const requestRef = doc(db, "fundRequests", requestId);
       const snap = await getDoc(requestRef);
       if (snap.exists()) {
         const currentRaised = snap.data().amountRaised || 0;
@@ -131,23 +137,22 @@ const DetailPage = () => {
           amountRaised: currentRaised + donationAmt,
         });
 
-        // Update UI immediately
         setRequestData((prev) => ({
           ...prev,
           amountRaised: currentRaised + donationAmt,
         }));
       }
 
-      alert("Donation sent successfully!");
       setDonationAmount("");
       setDonationMessage("");
+      alert("Donation sent successfully!");
     } catch (e) {
       console.error("Error sending donation:", e);
-      alert("Failed to send donation.");
+      alert("Failed to send donation. Please try again.");
     }
   };
 
-  if (!requestData) {
+  if (isLoading || !requestData) {
     return (
       <View style={styles.loader}>
         <ActivityIndicator size="large" color="#ff4500" />
@@ -162,45 +167,41 @@ const DetailPage = () => {
     description,
     amountRaised = 0,
     amountRequested = 0,
-    // status = "pending",
     createdAt,
   } = requestData;
 
   const progress = amountRequested > 0 ? amountRaised / amountRequested : 0;
-  const percentage = Math.round(progress * 100);
-  const readableDate =
-    typeof createdAt?.toDate === "function"
-      ? createdAt.toDate().toLocaleDateString("en-GB")
-      : String(createdAt) || "N/A";
-
-  const statusColors = {
-    pending: "#FF9800",
-    active: "#2196F3",
-    completed: "#4CAF50",
-    cancelled: "#F44336",
-  };
+  const percentage = Math.min(Math.round(progress * 100), 100);
+  const readableDate = createdAt?.toDate
+    ? createdAt.toDate().toLocaleDateString("en-GB")
+    : "N/A";
 
   return (
-    <SafeAreaView>
+    <SafeAreaView style={styles.safeArea}>
       <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
-        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={styles.keyboardView}
       >
-        <Stack.Screen options={{ title: "Fund Details", headerShown: true }} />
         <ScrollView
-          style={styles.container}
-          contentContainerStyle={{ paddingBottom: 40 }}
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
         >
           <Animated.View
             style={{ opacity: fadeAnim, transform: [{ scale: scaleAnim }] }}
           >
-            {blogImg ? (
-              <Animated.Image source={{ uri: blogImg }} style={styles.image} />
-            ) : (
-              <View style={styles.imagePlaceholder}>
-                <Feather name="image" size={40} color="#ccc" />
-              </View>
-            )}
+            <View style={styles.imageContainer}>
+              {blogImg ? (
+                <Image source={{ uri: blogImg }} style={styles.image} />
+              ) : (
+                <View style={styles.imagePlaceholder} />
+              )}
+              <TouchableOpacity
+                onPress={() => router.back('/donor/give')}
+                style={styles.backIcon}
+              >
+                <Ionicons name="arrow-back" size={28} color="#fff" />
+              </TouchableOpacity>
+            </View>
 
             <View style={styles.content}>
               <Text style={styles.title}>{title}</Text>
@@ -209,38 +210,14 @@ const DetailPage = () => {
 
               <View style={styles.metaContainer}>
                 <View style={styles.metaItem}>
-                  <Feather name="calendar" size={18} color="#ff4500" />
+                  <Ionicons name="calendar-outline" size={18} color="#ff4500" />
                   <Text style={styles.metaText}> {readableDate}</Text>
                 </View>
 
                 <View style={styles.metaItem}>
-                  <Feather name="user" size={18} color="#ff4500" />
+                  <Ionicons name="person-outline" size={18} color="#ff4500" />
                   <Text style={styles.metaText}> {needyName}</Text>
                 </View>
-
-                {/* <View
-                style={[
-                  styles.statusBadge,
-                  {
-                    backgroundColor: statusColors[status.toLowerCase()] + "20",
-                  },
-                ]}
-              >
-                <Feather
-                  name="info"
-                  size={16}
-                  color={statusColors[status.toLowerCase()] || "#555"}
-                />
-                <Text
-                  style={[
-                    styles.metaText,
-                    { color: statusColors[status.toLowerCase()] || "#555" },
-                  ]}
-                >
-                  {" "}
-                  {status.charAt(0).toUpperCase() + status.slice(1)}
-                </Text>
-              </View> */}
               </View>
 
               <View style={styles.amountContainer}>
@@ -259,7 +236,7 @@ const DetailPage = () => {
                     {
                       width: `${percentage}%`,
                       backgroundColor:
-                        percentage >= 100 ? statusColors.completed : "#ff4500",
+                        percentage >= 100 ? "#4CAF50" : "#ff4500",
                     },
                   ]}
                 />
@@ -278,6 +255,7 @@ const DetailPage = () => {
                   keyboardType="numeric"
                   value={donationAmount}
                   onChangeText={setDonationAmount}
+                  returnKeyType="done"
                 />
 
                 <TextInput
@@ -287,9 +265,13 @@ const DetailPage = () => {
                   numberOfLines={4}
                   value={donationMessage}
                   onChangeText={setDonationMessage}
+                  returnKeyType="done"
                 />
 
-                <TouchableOpacity style={styles.button} onPress={SendDonation}>
+                <TouchableOpacity
+                  style={styles.button}
+                  onPress={handleDonation}
+                >
                   <Text style={styles.buttonText}>SEND DONATION →</Text>
                 </TouchableOpacity>
               </View>
@@ -304,156 +286,180 @@ const DetailPage = () => {
 export default DetailPage;
 
 const styles = StyleSheet.create({
-  container: {
+  safeArea: {
     flex: 1,
     backgroundColor: "#fff",
+  },
+  keyboardView: {
+    flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    paddingBottom: 40,
   },
   loader: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "#fff",
   },
   loaderText: {
-    marginTop: 8,
-    color: "#ff4500",
+    marginTop: 15,
+    color: "#ff6b35",
+    fontSize: 16,
+    fontWeight: "500",
+  },
+  imageContainer: {
+    position: "relative",
   },
   image: {
     width: "100%",
     height: 280,
     resizeMode: "cover",
+    borderBottomLeftRadius: 25,
+    borderBottomRightRadius: 25,
   },
   imagePlaceholder: {
     width: "100%",
     height: 280,
-    backgroundColor: "#f8f8f8",
-    justifyContent: "center",
-    alignItems: "center",
+    backgroundColor: "#f0f2f5",
+    borderBottomLeftRadius: 25,
+    borderBottomRightRadius: 25,
+  },
+  backIcon: {
+    position: "absolute",
+    top: 40,
+    left: 20,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    padding: 8,
+    borderRadius: 20,
+    zIndex: 10,
   },
   content: {
     padding: 24,
-    paddingTop: 18,
+    paddingTop: 20,
   },
   title: {
-    fontSize: 26,
-    fontWeight: "700",
-    marginBottom: 12,
-    color: "#222",
+    fontSize: 28,
+    fontWeight: "800",
+    marginBottom: 15,
+    color: "#1e293b",
+    lineHeight: 34,
   },
   divider: {
-    height: 1,
-    backgroundColor: "#eee",
-    marginBottom: 16,
+    height: 1.5,
+    backgroundColor: "#e2e8f0",
+    marginBottom: 20,
+    borderRadius: 2,
   },
   description: {
-    fontSize: 16,
-    color: "#444",
-    marginBottom: 20,
-    lineHeight: 24,
+    fontSize: 16.5,
+    color: "#475569",
+    marginBottom: 25,
+    lineHeight: 26,
   },
   metaContainer: {
     flexDirection: "row",
     flexWrap: "wrap",
     gap: 12,
-    marginBottom: 20,
+    marginBottom: 25,
   },
   metaItem: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#f9f9f9",
-    paddingHorizontal: 12,
+    backgroundColor: "#f1f5f9",
+    paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 20,
-    marginRight: 10,
-    marginBottom: 10,
-  },
-  statusBadge: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 20,
+    marginRight: 8,
+    marginBottom: 8,
   },
   metaText: {
-    fontSize: 14,
-    color: "#555",
+    fontSize: 14.5,
+    color: "#4b5563",
+    fontWeight: "500",
+    marginLeft: 6,
   },
   amountContainer: {
-    marginBottom: 12,
     flexDirection: "row",
     alignItems: "baseline",
-    gap: 6,
+    gap: 8,
+    marginBottom: 15,
   },
   raised: {
-    fontSize: 18,
-    color: "#ff4500",
-    fontWeight: "700",
+    fontSize: 20,
+    color: "#ff6b35",
+    fontWeight: "800",
+    letterSpacing: 0.2,
   },
   goal: {
-    fontSize: 15,
-    color: "#666",
+    fontSize: 16,
+    color: "#64748b",
+    fontWeight: "600",
   },
   progressBar: {
-    height: 10,
-    backgroundColor: "#f0f0f0",
-    borderRadius: 5,
+    height: 12,
+    backgroundColor: "#e2e8f0",
+    borderRadius: 8,
     overflow: "hidden",
     marginTop: 8,
   },
   progressFill: {
     height: "100%",
-    borderRadius: 5,
+    borderRadius: 8,
   },
   percentage: {
-    marginTop: 8,
-    fontWeight: "600",
-    color: "#333",
-    fontSize: 15,
+    marginTop: 12,
+    fontWeight: "700",
+    color: "#334155",
+    fontSize: 16,
+    alignSelf: "flex-end",
   },
   formContainer: {
     marginTop: 30,
-    paddingTop: 20,
-    borderTopWidth: 1,
-    borderTopColor: "#eee",
+    paddingTop: 25,
+    borderTopWidth: 1.5,
+    borderTopColor: "#e2e8f0",
+    borderRadius: 2,
   },
   formTitle: {
-    fontSize: 20,
-    fontWeight: "700",
-    marginBottom: 6,
-    color: "#222",
+    fontSize: 22,
+    fontWeight: "800",
+    marginBottom: 8,
+    color: "#1e293b",
   },
   formSubtitle: {
-    fontSize: 14,
-    color: "#666",
-    marginBottom: 18,
+    fontSize: 15,
+    color: "#64748b",
+    marginBottom: 22,
+    lineHeight: 22,
   },
   input: {
     backgroundColor: "#fff",
-    borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 8,
-    padding: 12,
+    borderWidth: 1.5,
+    borderColor: "#e2e8f0",
+    borderRadius: 12,
+    padding: 16,
     fontSize: 16,
-    marginBottom: 14,
+    marginBottom: 16,
+    color: "#1e293b",
+    fontWeight: "500",
   },
   textArea: {
-    height: 100,
+    height: 110,
     textAlignVertical: "top",
   },
   button: {
-    backgroundColor: "#ff6600",
-    paddingVertical: 14,
-    borderRadius: 30,
+    backgroundColor: "#ff6b35",
+    paddingVertical: 16,
+    borderRadius: 14,
     alignItems: "center",
-    shadowColor: "#ff6600",
-    shadowOpacity: 0.3,
-    shadowRadius: 10,
-    elevation: 3,
-    marginTop: 4,
+    marginTop: 8,
   },
   buttonText: {
     color: "#fff",
-    fontSize: 15,
-    fontWeight: "bold",
-    textTransform: "uppercase",
+    fontSize: 16.5,
+    fontWeight: "800",
+    letterSpacing: 0.5,
   },
 });
