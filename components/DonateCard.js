@@ -23,12 +23,13 @@ const EmergencyCard = ({
       onPress={() => router.push(`Donate/${id}`)}
     >
       <Image source={{ uri: img }} style={styles.image} />
-      <Text style={styles.title}>{title}</Text>
-      <Text style={styles.description}>
-        {description.length > 100
-          ? description.slice(0, 100) + "..."
-          : description}
+      <Text style={styles.title} numberOfLines={1}>
+        {title}
       </Text>
+      <Text style={styles.description} numberOfLines={3}>
+        {description}
+      </Text>
+
       <View style={styles.progressContainer}>
         <Text style={styles.raisedText}>Raised: Rs {amountraise}</Text>
         <Text style={styles.targetText}>Target: Rs {requestedamm}</Text>
@@ -46,18 +47,19 @@ const EmergencyCard = ({
     </TouchableOpacity>
   );
 };
+
 const styles = StyleSheet.create({
   card: {
     backgroundColor: "#fff",
     borderRadius: 10,
     padding: 10,
+    height: 'auto', // fixed height for consistency
+    overflow: "hidden",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 5,
     elevation: 3,
-    maxHeight: 400, // Limit height
-    overflow: "hidden",
   },
   image: {
     width: "100%",
@@ -67,14 +69,16 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: "bold",
-    marginVertical: 5,
+    marginTop: 8,
+    color: "#222",
   },
   description: {
     fontSize: 14,
     color: "#555",
+    marginTop: 4,
   },
   progressContainer: {
-    marginVertical: 10,
+    marginTop: "30", // pushes to bottom
   },
   raisedText: {
     fontSize: 14,
