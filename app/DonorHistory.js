@@ -109,7 +109,7 @@ const DonationsPage = () => {
                   <View style={styles.totalInnerPattern}>
                     <Text style={styles.title}>Total Donated</Text>
                     <Text style={styles.amount}>
-                      ₹{total.toLocaleString("en-IN")}
+                      Rs.{total.toLocaleString("en-IN")}
                     </Text>
                   </View>
                 </LinearGradient>
@@ -147,7 +147,7 @@ const DonationsPage = () => {
                   <Text style={styles.cardTitle}>To: {item.needyName}</Text>
                   <View style={styles.amountPill}>
                     <Text style={styles.cardAmount}>
-                      ₹{item.amount.toLocaleString("en-IN")}
+                      Rs.{item.amount.toLocaleString("en-IN")}
                     </Text>
                   </View>
                 </View>
