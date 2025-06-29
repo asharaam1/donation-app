@@ -1,10 +1,11 @@
 import * as ImagePicker from "expo-image-picker";
 import React, { useEffect, useState } from "react";
-import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity } from "react-native";
+import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, Image } from "react-native";
 
 import { router } from "expo-router";
 import { addDoc, collection, doc, getDoc } from "firebase/firestore";
 import { auth, db } from "../../../Firebase/config";
+import { View } from "react-native";
 
 const RaiseFundScreen = () => {
   const [loading, setLoading] = useState(true);
@@ -34,28 +35,34 @@ const RaiseFundScreen = () => {
     fetchUser();
   }, []);
 
-  const pickImage = async (setImage) => {
-    let result = await ImagePicker.launchImageLibraryAsync({
+  const pickImage = async (setImageFn) => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== "granted") {
+      alert("Permission to access media library is required!");
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       quality: 1,
-      base64: true,
     });
 
     if (!result.canceled) {
-      const file = result.assets[0].uri;
-      console.log("Selected image file:", file);
-      setImage(file);
+      const uri = result.assets[0].uri;
+      setImageFn({ uri }); // <-- Store object with .uri like expected by Image component
+      console.log("Selected Image URI:", uri);
     }
   };
 
   const uploadToCloudinary = async (imageUri) => {
     try {
-      const response = await fetch(imageUri);
-      const blob = await response.blob();
-
       const data = new FormData();
-      data.append("file", blob, "profile-image.jpg");
+      data.append("file", {
+        uri: imageUri,
+        name: "blog.jpg",
+        type: "image/jpeg",
+      });
       data.append("upload_preset", "react-native");
       data.append("cloud_name", "do8y0zgci");
 
@@ -64,16 +71,18 @@ const RaiseFundScreen = () => {
         {
           method: "POST",
           body: data,
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
         }
       );
 
       const result = await res.json();
-
       if (result.secure_url) {
-        console.log("Uploaded Image URL:", result.secure_url);
+        console.log("Image uploaded:", result.secure_url);
         return result.secure_url;
       } else {
-        console.error("Cloudinary Upload Error:", result);
+        console.error("Cloudinary error:", result);
         return null;
       }
     } catch (err) {
@@ -138,8 +147,19 @@ const RaiseFundScreen = () => {
           <TextInput style={styles.inputBox} placeholder="Fund Title" value={fundTitle} onChangeText={setFundTitle} />
           <TextInput style={styles.inputBox} placeholder="Amount Needed" value={fundAmount} onChangeText={setFundAmount} keyboardType="numeric" />
           <TextInput style={styles.inputBox} placeholder="Tell us your story..." value={fundDescription} onChangeText={setFundDescription} multiline numberOfLines={4} />
-          <TouchableOpacity style={styles.inputBox} onPress={() => pickImage(setBlogImgFile)}>
-            <Text>Select Image for Fund</Text>
+          <TouchableOpacity onPress={() => pickImage(setBlogImgFile)}>
+            <View style={styles.imagePicker}>
+              {blogImgFile ? (
+                <Image
+                  source={{ uri: blogImgFile.uri }}
+                  style={styles.previewImage}
+                />
+              ) : (
+                <Text style={{ color: "#666", textAlign: "center" }}>
+                  Pick fund image
+                </Text>
+              )}
+            </View>
           </TouchableOpacity>
           <TouchableOpacity style={styles.button} onPress={submitFundRaise} disabled={fundLoading}>
             <Text style={styles.buttonText}>{fundLoading ? "Submitting..." : "Raise Fund"}</Text>
@@ -187,6 +207,22 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#fff',
     fontWeight: 'bold',
+  },
+  imagePicker: {
+    height: 250,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 10,
+    marginBottom: 12,
+    justifyContent: "center",
+    alignItems: "center",
+    overflow: "hidden",
+    backgroundColor: "#fafafa",
+  },
+  previewImage: {
+    width: "100%",
+    height: "100%",
+    resizeMode: "cover",
   },
 });
 

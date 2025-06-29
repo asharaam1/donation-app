@@ -122,8 +122,9 @@ const DetailPage = () => {
       await addDoc(collection(db, "donations"), {
         donorId,
         donorName,
-        needyid: requestId,
+        needyid: requestData.userId,      // ✅ Needy user's UID
         needyName,
+        fundRequestId: requestId,         // ✅ Fund request's ID
         amount: donationAmt,
         message: donationMessage,
         createdAt: Date.now(),

@@ -131,8 +131,12 @@ export default function Signup() {
 
       if (role === "donor") {
         router.push("/donor");
-      } else {
+      } else if (role === "needy") {
         router.push("/needy");
+      } else {
+        alert("Invalid role selected.");
+        router.push("/");
+        return;
       }
     } catch (error) {
       console.error("Signup error:", error.message);
