@@ -8,24 +8,30 @@
     "scheme": "donationapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
-    "permissions": [
-      "CAMERA"
-    ],
-    "ios": {
-      "supportsTablet": true
-    },
+
     "android": {
+      "permissions": [
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE"
+      ],
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true
     },
+
+    "ios": {
+      "supportsTablet": true
+    },
+
     "web": {
       "bundler": "metro",
       "output": "static",
       "favicon": "./assets/images/favicon.png"
     },
+
     "plugins": [
       "expo-router",
       [
@@ -39,6 +45,7 @@
       ],
       "expo-web-browser"
     ],
+
     "experiments": {
       "typedRoutes": true
     }
