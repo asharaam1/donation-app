@@ -29,26 +29,32 @@ export default function Signup() {
   const [uploading, setUploading] = useState(false);
 
   const pickImage = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== "granted") {
+      alert("Permission to access media library is required!");
+      return;
+    }
+
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      quality: 1,
       allowsEditing: true,
-      base64: true,
+      quality: 1,
     });
 
     if (!result.canceled) {
       setImage(result.assets[0].uri);
-      console.log("Image URI:", result.assets[0].uri);
+      console.log("Selected Image URI:", result.assets[0].uri);
     }
   };
 
   const uploadImageToCloudinary = async (imageUri) => {
     try {
-      const response = await fetch(imageUri);
-      const blob = await response.blob();
-
       const data = new FormData();
-      data.append("file", blob, "profile-image.jpg");
+      data.append("file", {
+        uri: imageUri,
+        name: "profile.jpg",
+        type: "image/jpeg",
+      });
       data.append("upload_preset", "react-native");
       data.append("cloud_name", "do8y0zgci");
 
@@ -57,16 +63,18 @@ export default function Signup() {
         {
           method: "POST",
           body: data,
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
         }
       );
 
       const result = await res.json();
-
       if (result.secure_url) {
-        console.log("Uploaded Image URL:", result.secure_url);
+        console.log("Image uploaded:", result.secure_url);
         return result.secure_url;
       } else {
-        console.error("Cloudinary Upload Error:", result);
+        console.error("Cloudinary error:", result);
         return null;
       }
     } catch (err) {
@@ -77,17 +85,24 @@ export default function Signup() {
 
   const signup = async () => {
     if (!role || !fullName || !email || !password || !confirmPassword) {
+      alert("Please fill all required fields.");
       return;
     }
+
     if (password !== confirmPassword) {
+      alert("Passwords do not match.");
       return;
     }
+
     setUploading(true);
+
     let imageUrl = null;
     if (image) {
       imageUrl = await uploadImageToCloudinary(image);
     }
+
     setUploading(false);
+
     try {
       const userCredential = await createUserWithEmailAndPassword(
         auth,
@@ -95,7 +110,8 @@ export default function Signup() {
         password
       );
       const user = userCredential.user;
-      const obj = {
+
+      const userData = {
         uid: user.uid,
         fullName,
         email,
@@ -103,22 +119,24 @@ export default function Signup() {
         profileImageUrl: imageUrl,
         createdAt: Date.now(),
       };
+
       if (role === "needy") {
-        obj.contact = contact;
-        obj.city = city;
+        userData.contact = contact;
+        userData.city = city;
       }
-      await setDoc(doc(db, "users", user.uid), obj );
-      AsyncStorage.setItem('uid', user.id);
-      AsyncStorage.setItem('user', JSON.stringify(obj))
+
+      await setDoc(doc(db, "users", user.uid), userData);
+      await AsyncStorage.setItem("uid", user.uid);
+      await AsyncStorage.setItem("user", JSON.stringify(userData));
+
       if (role === "donor") {
         router.push("/donor");
-      } else if (role === "needy") {
-        router.push("/needy");
       } else {
-        router.push("/");
+        router.push("/needy");
       }
     } catch (error) {
       console.error("Signup error:", error.message);
+      alert("Signup failed: " + error.message);
     }
   };
 
@@ -130,32 +148,39 @@ export default function Signup() {
             <Image source={logo} style={styles.logo} resizeMode="contain" />
             <Text style={styles.title}>Sign Up</Text>
 
-            {/* Role Buttons */}
             <View style={styles.roleButtonsRow}>
               <TouchableOpacity
                 style={[
                   styles.roleButton,
-                  role !== "donor" ? styles.inactiveRole : null,
+                  role !== "donor" && styles.inactiveRole,
                 ]}
                 onPress={() => setRole("donor")}
               >
-                <Text style={[
-                  styles.roleButtonText,
-                  role !== "donor" ? styles.inactiveRoleText : null,
-                ]}>Donor</Text>
+                <Text
+                  style={[
+                    styles.roleButtonText,
+                    role !== "donor" && styles.inactiveRoleText,
+                  ]}
+                >
+                  Donor
+                </Text>
               </TouchableOpacity>
 
               <TouchableOpacity
                 style={[
                   styles.roleButton,
-                  role !== "needy" ? styles.inactiveRole : null,
+                  role !== "needy" && styles.inactiveRole,
                 ]}
                 onPress={() => setRole("needy")}
               >
-                <Text style={[
-                  styles.roleButtonText,
-                  role !== "needy" ? styles.inactiveRoleText : null,
-                ]}>Needy</Text>
+                <Text
+                  style={[
+                    styles.roleButtonText,
+                    role !== "needy" && styles.inactiveRoleText,
+                  ]}
+                >
+                  Needy
+                </Text>
               </TouchableOpacity>
             </View>
 
@@ -302,10 +327,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: "center",
     elevation: 2,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
   },
   inactiveRole: {
     backgroundColor: "#d1d5dc",
