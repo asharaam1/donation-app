@@ -3,7 +3,7 @@ import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Image,
   ScrollView,
@@ -16,6 +16,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { auth, db } from "../../Firebase/config";
 import logo from "../../assets/images/logo.png";
+import * as Location from "expo-location";
 
 export default function Signup() {
   const [role, setRole] = useState("donor");
@@ -27,6 +28,27 @@ export default function Signup() {
   const [city, setCity] = useState("");
   const [image, setImage] = useState(null);
   const [uploading, setUploading] = useState(false);
+  const [Latitude, setLatitude] = useState();
+  const [longitude, setLongitude] = useState();
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    let position = async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+
+      if (!status) {
+        setError(true);
+        return;
+      }
+
+      let location = await Location.getCurrentPositionAsync({});
+      const { latitude, longitude } = location.coords;
+      setLatitude(latitude);
+      setLongitude(longitude);
+    };
+
+    position();
+  }, []);
 
   const pickImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -117,6 +139,8 @@ export default function Signup() {
         email,
         role,
         profileImageUrl: imageUrl,
+        latitude: Latitude,
+        longitude: longitude,
         createdAt: Date.now(),
       };
 
