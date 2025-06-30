@@ -56,28 +56,34 @@ const RaiseFundScreen = () => {
     fetchUser();
   }, []);
 
-  const pickImage = async (setImage) => {
-    let result = await ImagePicker.launchImageLibraryAsync({
+  const pickImage = async (setImageFn) => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== "granted") {
+      alert("Permission to access media library is required!");
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       quality: 1,
-      base64: true,
     });
 
     if (!result.canceled) {
-      const file = result.assets[0].uri;
-      console.log("Selected image file:", file);
-      setImage({ uri: file });
+      const uri = result.assets[0].uri;
+      setImageFn({ uri }); // <-- Store object with .uri like expected by Image component
+      console.log("Selected Image URI:", uri);
     }
   };
 
   const uploadToCloudinary = async (imageUri) => {
     try {
-      const response = await fetch(imageUri);
-      const blob = await response.blob();
-
       const data = new FormData();
-      data.append("file", blob, "cnic.jpg");
+      data.append("file", {
+        uri: imageUri,
+        name: "cnic.jpg",
+        type: "image/jpeg",
+      });
       data.append("upload_preset", "react-native");
       data.append("cloud_name", "do8y0zgci");
 
@@ -86,16 +92,18 @@ const RaiseFundScreen = () => {
         {
           method: "POST",
           body: data,
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
         }
       );
 
       const result = await res.json();
-
       if (result.secure_url) {
-        console.log("Uploaded Image URL:", result.secure_url);
+        console.log("Image uploaded:", result.secure_url);
         return result.secure_url;
       } else {
-        console.error("Cloudinary Upload Error:", result);
+        console.error("Cloudinary error:", result);
         return null;
       }
     } catch (err) {
@@ -103,6 +111,7 @@ const RaiseFundScreen = () => {
       return null;
     }
   };
+
 
   const submitKyc = async () => {
     if (!cnicFront || !cnicBack || !address.trim() || !mobile.trim()) {
@@ -136,8 +145,8 @@ const RaiseFundScreen = () => {
       }
 
       const [frontUrl, backUrl] = await Promise.all([
-        uploadToCloudinary(cnicFront.uri),
-        uploadToCloudinary(cnicBack.uri),
+        uploadToCloudinary(cnicFront?.uri),
+        uploadToCloudinary(cnicBack?.uri),
       ]);
 
       const obj = {
@@ -225,6 +234,8 @@ const RaiseFundScreen = () => {
             </Text>
           </TouchableOpacity>
         </>
+      ) : userData.kycStatus === "approved" ? (
+        router.push("/needy/fundraise")
       ) : (
         <>
           <Text style={styles.title}>Wait for Response</Text>

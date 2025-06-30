@@ -31,7 +31,7 @@ export default function GiveDonation() {
             createdAt: d.createdAt,
             description: d.description,
           };
-        });
+        }).filter((item) => item.status === "approved");
         setData(fetchedData);
       },
       (error) => {
