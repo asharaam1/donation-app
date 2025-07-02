@@ -5,11 +5,14 @@ import {
   StyleSheet,
   ActivityIndicator,
   TouchableOpacity,
+  Dimensions,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { auth, db } from "../Firebase/config";
 import { onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
+import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps'
+import * as Location from 'expo-location';
 
 export default function Address() {
   const [userData, setUserData] = useState(null);
@@ -39,7 +42,7 @@ export default function Address() {
     );
   }
 
-  if (!userData || (!userData.country && !userData.contact)) {
+  if (!userData || (!userData.city && !userData.contact)) {
     return (
       <View style={styles.container}>
         <Text style={styles.header}>Address Information</Text>
@@ -61,16 +64,49 @@ export default function Address() {
         <View style={styles.row}>
           <View style={styles.labelContainer}>
             <Ionicons name="location-outline" size={24} color="#FF5F15" />
-            <Text style={styles.label}>Country</Text>
+            <Text style={styles.label}>City</Text>
           </View>
-          <Text style={styles.value}>{userData?.country || "Not set"}</Text>
+          <Text style={styles.value}>{userData?.city || "Not set"}</Text>
         </View>
         <View style={styles.row}>
           <View style={styles.labelContainer}>
             <Ionicons name="call-outline" size={24} color="#FF5F15" />
             <Text style={styles.label}>Phone</Text>
           </View>
-          <Text style={styles.value}>{userData?.contact || "Not set"}</Text>
+          <Text style={styles.value}>{userData?.mobile || "Not set"}</Text>
+        </View>
+        <View style={styles.row}>
+          <View style={{ marginBottom: 0 }}>
+            <View style={styles.labelContainer}>
+              <Ionicons name="location-outline" size={24} color="#FF5F15" />
+              <Text style={styles.label}>Registered Location</Text>
+            </View>
+            <MapView
+              style={{
+                width: Dimensions.get('screen').width * 0.79,
+                height: Dimensions.get('screen').width * 0.83,
+                borderRadius: 20,
+                marginTop: 20,
+              }}
+              provider={PROVIDER_GOOGLE}
+              showsUserLocation={true}
+              initialRegion={{
+                latitude: 24.8696559,
+                longitude: 67.1785103,
+                latitudeDelta: 0.01,
+                longitudeDelta: 0.01,
+              }}
+            >
+              <Marker
+                coordinate={{
+                  latitude: 24.8696559,
+                  longitude: 67.1785103,
+                }}
+                title="User Location"
+                description="This user is here"
+              />
+            </MapView>
+          </View>
         </View>
         <TouchableOpacity style={styles.editButton}>
           <Text style={styles.editButtonText}>Edit Address</Text>
