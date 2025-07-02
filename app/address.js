@@ -1,18 +1,18 @@
-import React, { useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  ActivityIndicator,
-  TouchableOpacity,
-  Dimensions,
-} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { auth, db } from "../Firebase/config";
 import { onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
-import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps'
-import * as Location from 'expo-location';
+import React, { useEffect, useState } from "react";
+import {
+  ActivityIndicator,
+  Dimensions,
+  Platform,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
+import { auth, db } from "../Firebase/config";
 
 export default function Address() {
   const [userData, setUserData] = useState(null);
@@ -40,6 +40,13 @@ export default function Address() {
         <Text style={styles.loadingText}>Loading...</Text>
       </View>
     );
+  }
+
+  let MapView;
+  if (Platform.OS === "web") {
+    MapView = require("react-native-maps").MapView;
+  } else {
+    MapView = require("react-native-maps").default;
   }
 
   if (!userData || (!userData.city && !userData.contact)) {
@@ -75,37 +82,44 @@ export default function Address() {
           </View>
           <Text style={styles.value}>{userData?.mobile || "Not set"}</Text>
         </View>
+        {/* Registered Location Row - Always shown */}
         <View style={styles.row}>
-          <View style={{ marginBottom: 0 }}>
+          <View style={{ marginBottom: 0, flex: 1 }}>
             <View style={styles.labelContainer}>
               <Ionicons name="location-outline" size={24} color="#FF5F15" />
               <Text style={styles.label}>Registered Location</Text>
             </View>
-            <MapView
-              style={{
-                width: Dimensions.get('screen').width * 0.79,
-                height: Dimensions.get('screen').width * 0.83,
-                borderRadius: 20,
-                marginTop: 20,
-              }}
-              provider={PROVIDER_GOOGLE}
-              showsUserLocation={true}
-              initialRegion={{
-                latitude: 24.8696559,
-                longitude: 67.1785103,
-                latitudeDelta: 0.01,
-                longitudeDelta: 0.01,
-              }}
-            >
-              <Marker
-                coordinate={{
-                  latitude: 24.8696559,
-                  longitude: 67.1785103,
+            {(userData.latitude && userData.longitude) ? (
+              <MapView
+                style={{
+                  width: Dimensions.get('screen').width * 0.79,
+                  height: Dimensions.get('screen').width * 0.83,
+                  borderRadius: 20,
+                  marginTop: 20,
                 }}
-                title="User Location"
-                description="This user is here"
-              />
-            </MapView>
+                provider={PROVIDER_GOOGLE}
+                showsUserLocation={true}
+                initialRegion={{
+                  latitude: userData.latitude,
+                  longitude: userData.longitude,
+                  latitudeDelta: 0.01,
+                  longitudeDelta: 0.01,
+                }}
+              >
+                <Marker
+                  coordinate={{
+                    latitude: userData.latitude,
+                    longitude: userData.longitude,
+                  }}
+                  title="User Location"
+                  description="This user is here"
+                />
+              </MapView>
+            ) : (
+              <Text style={{ color: '#999', marginTop: 20, fontStyle: 'italic' }}>
+                No registered location available
+              </Text>
+            )}
           </View>
         </View>
         <TouchableOpacity style={styles.editButton}>
