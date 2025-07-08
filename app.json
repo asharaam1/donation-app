@@ -4,7 +4,7 @@
     "slug": "donation-app",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/logo.png",
     "scheme": "donationapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -16,8 +16,8 @@
         "WRITE_EXTERNAL_STORAGE"
       ],
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff",
+        "foregroundImage": "./assets/images/logo.png",
+        "backgroundColor": "#FF5F15",
         "googleServicesFile": "./google-services.json",
         "package": "com.asharaam.donation-app",
         "googleMapsApiKey": "process.env.GOOGLE_MAPS_API_KEY"
@@ -43,7 +43,7 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash-icon.png",
+          "image": "./assets/images/logo.png",
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
